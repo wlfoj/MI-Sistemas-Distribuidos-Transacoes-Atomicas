@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  device1:
+    image: banco-app
+    tty: true
+    environment:
+      - BANK_CODE=1
+    networks:
+      minha_rede:
+        ipv4_address: 172.16.103.3
+
+  device2:
+    image: banco-app
+    tty: true
+    environment:
+      - BANK_CODE=2
+    networks:
+      minha_rede:
+        ipv4_address: 172.16.103.4
+
+networks:
+  minha_rede:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.103.0/24

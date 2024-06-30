@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fcdc5770-82bb-4cc0-86ef-5918adb2d706" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/ServiceDiscoveryResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Retries.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/ThreadRetriesProcessor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/ThreadServiceDiscovery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/controllers/BankController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/controllers/BankController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/controllers/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/controllers/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/controllers/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/controllers/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/SourceOrDestinyTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/SourceOrDestinyTransaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/in/OperationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/in/OperationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/in/TransactionRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/out/AsyncResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/out/CreateAccountResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/dto/out/CreateAccountResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/AppConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/ClientDisconnectInterceptor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/Consortium.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/ConsortiumConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/HttpClientConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/QueueConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/infra/config/WebConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/Bank.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/Bank.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/Task.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/Transaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/Transaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/TransferStatus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/model/TransferType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/services/AsyncTransferProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/services/BankService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/services/BankService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/services/HttpService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/services/HttpService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/java/transacoes_distribuidas/services/SagaChoreography.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend - Copia/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend - Copia/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/controllers/BankController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/controllers/BankController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/controllers/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/controllers/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/Operation2PC.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/in/AuthRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/in/AuthRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/AuthResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/AuthResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/BalanceResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/BalanceResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/CreateAccountResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/CreateAccountResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/_2PCResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/dto/out/_2PCResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/AppConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/config/Consortium.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/Consortium.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/config/ConsortiumConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/ConsortiumConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/CorsConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/config/HttpClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/HttpClientConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/config/QueueConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/infra/QueueConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Bank.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Bank.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Operation.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Operation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Task.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Transaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/model/Transaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/presenters/PresenterOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/presenters/PresenterOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/BankService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/BankService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/HttpService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/HttpService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/State2PC.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/State2PC.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/ThreadRetriesAbort.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/TwoPhaseCommitCoordinator.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/transacoes_distribuidas/services/TwoPhaseCommitCoordinator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/trash/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/trash/docker-compose.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2i1ec2TQu5GCYC4Rx0S4YEQ1TMr" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fcdc5770-82bb-4cc0-86ef-5918adb2d706" name="Changes" comment="" />
+      <created>1718662591919</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1718662591919</updated>
+    </task>
+    <servers />
+  </component>
+</project>
