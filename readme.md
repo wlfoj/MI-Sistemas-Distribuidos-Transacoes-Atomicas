@@ -7,16 +7,12 @@
 + [Visão geral](#2-visão-geral)
 
 + [Discussão sobre produto](#3-discussão-sobre-o-produto)
-+ &nbsp;&nbsp;&nbsp;[Transações Atômicas](#31-transações-atômicas)
-+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Two Phase Commit](#311-two-phase-commit)
-+ &nbsp;&nbsp;&nbsp;[API do Banco](#31-broker)
-+ &nbsp;&nbsp;&nbsp;[Interface gráfica](#32-dispositivo)
++ &nbsp;&nbsp;&nbsp;[Transações Atômicas](#31-transação-atômica-e-2pc)
++ &nbsp;&nbsp;&nbsp;[Confiabilidade](#32-confiabilidade-e-resiliência)
 
 + [Protocolos de Comunicações e Mensagens](#4-protocolos-de-comunicações-e-mensagens)
-+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Entre Banco e Usuário](#34-entre-banco-e-usuario)
-+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Entre Bancos](#34-entre-bancos)
-
-+ &nbsp;&nbsp;&nbsp;[Aspectos Gerais](#35-aspectos-gerais)
++ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Entre Banco e Usuário](#42-entre-banco-e-interface-gráfica)
++ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Entre Bancos](#43-entre-bancos-banco-a-banco)
 + [Conclusão](#5-conclusões)
 
 # 0. Como executar no LARSID
@@ -82,21 +78,17 @@ O sistema faz o uso de um protocolo de transações atômicas chamado Two Phase 
 
 # 3. Discussão sobre o produto
 O sistema desenvolvido busca apresentar uma solução para o sistema de banco distribuidos, sem um banco central coordenador, para a tarefa de realizar transferências, pagamentos de conta e depósitos entre contas. Um mesmo usuário pode acessar as contas em diferentes bancos, após realizar o login em determinado banco. Todos os bancos expõe uma API Restful, desenvolvida com Java Spring Boot 3, pela qual toda a comunicação (seja com cliente ou outro banco) é feita. Em cada nó do sistema deverá haver o aplicativo da interface frontend, desenvolvida com o React, e o aplicativo do backend executando. Sendo assim, cada computador do LARSID irá executar os dois processos para constituir um único nó. 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-O Broker apresenta suporte a conexões simultâneas de vários dispositivos (no código está limitado a 10 conexões, para fins de testes) e por isso se fez necessário o uso de threads. O Broker possui 5 'subprocessos': o da API Restfull; o que recebe mensagens via UDP; o que envia mensagens via TCP; o que recebe e valida as conexões TCP de dispositivos; o que verifica se algum dispositivo foi desconectado. Como todas as threads fazem uso de uma área de dados sensíveis, que são os dispositivos registrados e os tópicos associados, naturalmente iria ocorrer de alguma thread apagar elementos de uma lista enquanto a outra thread estivesse iterando-a. Para sanar esse problema, utilizou-se um mutex, assim somente uma thread acessará uma região crítica por vez.
+O serviço do banco possui uma thread para processamento exclusivo de transações, sempre que chega uma requisição de transação, a mesma será validada e depositada em fila para a thread consumir posteriormente.
 
-Com intuito de tornar o sistema confiável e robusto, desenvolveu-se soluções para lidarem com situações critícas, como a desconexão de algum nó (Broker ou Dispositivo). Cada dispositivo é capaz de identificar quando o Broker é desconectado, como tammbém é capaz de estabelecer uma nova conexão com Broker. O Broker possui mecanismos para detectar quando um dispositivo é desconectado, e atuar removendo o mesmo de sua lista de conexões. Para este trabalho, tanto o Broker quanto o Dispositivo são considerados desconectados quando a conexão TCP apresenta alguma inconsistência.
+Dentro do sistema, para torna-lo confiavél e roobusto, fez-se o uso de mutex para cada conta criada, impedindo que duas solicitações pudessem gerar algum problema no saldo de determinada conta ao concorrerem em uma operação. Com o uso do 2PC, caso uma conta esteja sendo utilizada em uma transação, a mesma ficará impossibilitada de participar de outra transação até que a mesma termine. Desta forma, lida-se com cenários de concorrência local ou distribuído.
 
-Caso seja utilizada mais de uma thread para consumir a fila de transações, o saldo atualizado ou visualizado por possíveis operações concorrentes não apresentaram falhas devido a um mutex associado à cada conta.As operações que alteram o saldo, de qualquer forma, estão protegidas com o uso de mutex, impossibilitando que alguma requisição seja responsável por introduzir um valor incoerente no saldo.
-
-Caso, ao tentar realizar uma transação, alguma conta estiver temporariamente em uso, a transação será recolocada em uma fila de processamento de transações  em vez de ser tratada como transação falha.
-
+-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 O sistema foi desenvolvido para ser resiliente e confiável, conforme é exemplificado pelos padrões de resiliência adotados. Entretando há um cenário em que impacta o funcionamento do sistema.
 Caso um banco A inicie uma transação, chame o Prepare em um banco B (que foi bem sucedido), e seja desconectado em seguida, deixará a conta no banco B travada até que o banco A seja reconectado. Ao ser reconectado, o banco A irá iniciar o processo de abort em todos os participantes.
 Além da situação acima, há uma outra que não pôde ser tratada. Caso um banco A seja desconectado enquanto um banco B esteja processando a sua requisição de Prepare, o banco B não será capaz de identificar que o banco A caiu e irá tratar como se a operção estivesse ocorrido sem erros. 
 Do lado do banco A, será visto um erro devido ao timeout 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 O sistema desenvolvido permite ao usuário, por meio de telas na interface gráfica, a criação de contas, sendo elas: do tipo fisíca (**figura 5**), do tipo conta conjunta (**figura 6**) ou do tipo conta jurídica (**figura 7**). É possível alterar apenas o saldo das contas, conforme discutido em sessão, não sendo necessário alterar nome da pessoa e data de nascimento por exemplo. Um usuário do sistema, desde que possua contas em outros bancos do sistema global, poderá utilizar destas contas para realizar transferências e pagamentos, conforme **figura 8** e **figura 9**.
 <p align="center"><b>Figura 5</b> - Tela cadastro conta física.</p>
@@ -144,7 +136,7 @@ Caso o usuário opte por realizar transferências para varias contas, deverá fa
 Todas as chamadas a API de um banco ocorrem de forma síncrona, exceto a de transações. Quando uma solicitação de transação é recebida, o banco avalia a requisição, buscando incoerências, e caso esteja incorreta irá responder uma mensagem de erro padrão (ver sessão de protocolos).
 Caso a transação recebida seja aprovada, a mesma é depositada em uma fila de transações cujo processamento se dará por uma outra thread. O processamento da transação em sí, na thread, é feito de forma síncrona, ou seja, é feita uma requisição para cada participante e aguarda-se a resposta. 
 
-#### 3.1 Transação Atômica - Two Phase Commit
+#### 3.1 Transação Atômica e 2PC
 Considerendo os padrões para uma transação atômica, escolheu-se utilizar o Two Phase Commit (2PC) para aplicação no sistema. Outras alternativas foram 
 consideradas, como SAGAS e o algoritmo de Ricart-Argwala. O SAGA não tem o foco em atômicidade de uma transação, isso é obtido por meio de uma atômicidade 
 eventual, e por isso não foi escolhido. O algoritmo de Ricart-Argwala trata todo o ambiente como uma região crítica distribuída. O 2PC não apresenta todo sua operação
@@ -177,7 +169,7 @@ Visando um maior controle sobre as operações realizadas, adotou-se um sistema 
 </p>
 <p align="center">Fonte: Autor</p>
 
-#### 3.2 Padrões de estabilidade e resiliência adotados
+#### 3.2 Confiabilidade e Resiliência
 Para tentar tornar o sistem mais confiável e robusto, aplicou-se padrões de resiliência ao sistema, buscando sanar as principais falhas que podem ocorrer.
 
 ##### 3.2.1 Timeouts
@@ -196,6 +188,7 @@ junto com o caso das mensagens de abort. Um objeto retries possui todas as infor
 
 # 4. Protocolos de Comunicações e Mensagens
 Todo o sistema se comunica por meio de mensagens json, recebidas por meio de uma API Rest. Os campos utilizados em cada mensagem enviada foram selecionados para serem autoexplicativos.
+
 #### 4.1 Tratador de exceção
 O sistema apresenta um mecanismo que capta exceções geradas, e não tratadas em código, e retorna uma mensagem especial para quem tiver solicitado qualquer tipo de informação. Em resumo,
 caso alguma exceção seja levantada ao processar uma requisição, uma resposta especial será lançada. A resposta segue o modelo abaixo, apresentando um campo 'message' com as informações do erro.
@@ -206,7 +199,7 @@ caso alguma exceção seja levantada ao processar uma requisição, uma resposta
 }
 ```
 
-## 4.2 Entre Banco e Cliente (Aplicação com interface gráfico e o Banco)
+## 4.2 Entre Banco e Interface Gráfica
 Cada aplicação gráfica (frontend) está associada a um serviço de backend (banco), ambos devem operar no mesmo host/computador. Com isso, as aplicações 
 devem fazer requisições para os seus respectivos bancos e aguardar por respostas dos mesmos. Veremos como tal troca de mensagem foi implementada.
 
@@ -273,7 +266,7 @@ O banco irá retornar um json contendo informações da conta e uma mensagem, ca
 }
 ```
 
-#### 4.2.3 Obtenção de todas as contas do cpf
+#### 4.2.3 Obtenção das contas acessadas pelo CPF globalmente
 Endpoint: /accounts/{cpf} 
 Metodo: GET  
 Para que um usuário consiga realizar transferências, o mesmo precisa saber quais contas pode acessar. Sendo assim, é feita uma solicitação no endpoint, passando o seu próprio
@@ -379,7 +372,7 @@ O banco irá retornar um json contendo todas as informações da transação (ba
 Cada está em um host/computador diferente, logo precisa-se de um acordo para as comunicações entre os mesmos. 
 Veremos como tal troca de mensagem foi implementada.
 
-#### 4.3.1 Obtenção das contas acessadas pelo CPF
+#### 4.3.1 Obtenção das contas acessadas pelo CPF locamente
 Endpoint: /accountsIn/{id}
 Metodo: GET  
 Cada banco tem seu conjunto de contas, um determinado usuário pode criar um conta individual em cada banco e várias conjuntas. 

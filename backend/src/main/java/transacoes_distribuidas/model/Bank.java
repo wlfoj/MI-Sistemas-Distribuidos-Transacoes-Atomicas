@@ -24,8 +24,21 @@ public class Bank {
     public static void setBankCode(String bankId){ bankCode = bankId;}
 
     public void addHistoryTransactions(Transaction transaction){
+        boolean alreadyExists = false;
         this.lockTransactions.lock();
-        this.historyTransactions.add(transaction);
+        for (Transaction transaction1: this.historyTransactions) {
+            // Se já tiver essa transação no histórico
+            if(transaction1.getTid().equals(transaction.getTid())){
+                // Sobrescrevo
+                transaction1 = transaction;
+                alreadyExists = true;
+                break;
+            }
+        }
+        // Se ainda não há a transação
+        if (alreadyExists == false){
+            this.historyTransactions.add(transaction);
+        }
         this.lockTransactions.unlock();
     }
 

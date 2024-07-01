@@ -44,7 +44,7 @@ public class TwoPhaseCommitCoordinator {
      */
     public void openTransaction(Transaction transaction){
         logger.info(String.format("2PC OPEN - Iniciando a transação{%s}", transaction.getTid()));
-        boolean isAvaliableToCommit = true; // Variavel auxiliar que vai me auxiliar a entender se o nó votou SIM para a operação
+        //boolean isAvaliableToCommit = true; // Variavel auxiliar que vai me auxiliar a entender se o nó votou SIM para a operação
         boolean accountWaiting = false; // Para informar se estou esperando uma conta em espera
         Operation operationInTime = null; // É a operação que estou processando
         int i=0, j;
@@ -55,7 +55,7 @@ public class TwoPhaseCommitCoordinator {
         /**  ======================== FASE DE PREPARE ======================== */
         logger.info(String.format("2PC OPEN - Entrando na fase de PREPARE transação{%s}", transaction.getTid()));
         for (i = 0; i < transaction.getOperations().size(); i++) {
-            // Obtem a operação
+            // Obtem a operação que tem a vez
             operationInTime = transaction.getOperations().get(i);
             // Verifica se o nó vai poder realizar ela
             aux = requestCanCommit(operationInTime); /** 2PC */
@@ -64,12 +64,12 @@ public class TwoPhaseCommitCoordinator {
                 nextState2PC = State2PC.ABORT;
                 break;
             }
-            logger.info(String.format("2PC OPEN - Realizei o PREPARE de operação{%s}=%b", operationInTime.getOid(), isAvaliableToCommit));
             // Se deu um erro em algum aqui, não envia o pedido para os demais e já começa a abortar os que já receberam
             if (aux.responseNode != ResponseNode.YES_CAN_COMMIT){
                 nextState2PC = State2PC.ABORT;
                 break;
             }
+            logger.info(String.format("2PC OPEN - Realizei o PREPARE de operação{%s} com sucesso!", operationInTime.getOid() ));
             nextState2PC = State2PC.COMMIT;
         }
 
@@ -77,7 +77,9 @@ public class TwoPhaseCommitCoordinator {
         /** ======================== FASE DE ABORT ======================== */
         if (nextState2PC == State2PC.ABORT){
             logger.info(String.format("2PC OPEN - Entrando na fase de ABORT transação{%s}", transaction.getTid()));
+            // Começo da anterior a dar falha pq, se tiver dado falha, o banco deverá liberar o lock antes de reportar a falha
             for (j = i-1; j >= 0; j--) {
+                // Obtem a operação que tem a vez
                 operationInTime = transaction.getOperations().get(j);
                 logger.info(String.format("2PC OPEN - Realizando o ABORT de operação{%s}", operationInTime.getOid()));
                 boolean inRetries = false;
@@ -96,11 +98,13 @@ public class TwoPhaseCommitCoordinator {
                     }
                 }
             }
+            logger.info(String.format("2PC OPEN - Operação de ABORT transação{%s} com sucesso", transaction.getTid()));
             // SE TIVE DE FAZER UM ABORT POR CONTA DE UMA ESPERA
             if(accountWaiting == true){
                 // Adiciona na lista de historico como falha
                 transaction.setTransactionStatus(TransactionStatus.WAITING_COMMIT);
                 this.bank.addHistoryTransactions(transaction);
+                logger.info(String.format("2PC OPEN - Colocando a transação{%s} de volta na fila", transaction.getTid()));
                 throw new AccountInUse("");
             }
             // SE NÃO ESTIVER EM UMA ESPERA, SIGNIFICA QUE FOI UM ERRO MESMO
@@ -242,7 +246,7 @@ public class TwoPhaseCommitCoordinator {
 
     public _2PCResponse requestDoAbort(Operation operation){
         String uri;
-        _2PCResponse res = null;
+        _2PCResponse res = new _2PCResponse();
 
         // Se for no banco atual/local
         if(operation.getBankCode().equals(Bank.getBankCode())){
