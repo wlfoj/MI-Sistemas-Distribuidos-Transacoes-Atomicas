@@ -46,7 +46,6 @@ export default function Physical() {
                 setError("Erro: " + err);
                 console.log("Erro: " + err);
             });
-
     }
 
 
@@ -65,7 +64,7 @@ export default function Physical() {
                 errors,
             }) => (
 
-                <Form onSubmit={handleSubmit} onChange={handleChange}>
+                <Form onSubmit={handleSubmit} onChange={handleChange} >
                     <Container style={container}>
                         <Row style={{ padding: '1rem' }}>
                             <h1 className="display-6" style={{ textAlign: 'center' }}> Conta Física </h1>

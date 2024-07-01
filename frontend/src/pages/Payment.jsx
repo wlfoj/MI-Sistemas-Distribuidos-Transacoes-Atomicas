@@ -61,7 +61,6 @@ export default function Payment() {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault(); // Para dar reload após o submit só retirar isso
 
         const accountResponse = {
             transactionType: "PAYMENT",
@@ -85,14 +84,13 @@ export default function Payment() {
             ]
         };
 
-        console.log(accountResponse)
 
         Api.post("/user/openTransaction", accountResponse)
 
             .then((body) => {
                 console.log(body.data)
                 setError("");
-                setMessage(body.data.message);
+                setMessage("tid=" +body.data.tid + "   status="+body.data.transactionStatus);
                 setTimeout(() => {
                     setMessage("");
                 }, 15000)
@@ -102,6 +100,8 @@ export default function Payment() {
                 setError("Erro: " + err);
                 console.log("Erro: " + err);
             });
+
+            e.preventDefault(); // Para dar reload após o submit só retirar isso
     };
 
     return (

@@ -8,6 +8,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import transacoes_distribuidas.dto.out.ErrorDetailsResponse;
 import transacoes_distribuidas.exceptions.AccountInUse;
+import transacoes_distribuidas.exceptions.InvalidOperation;
 import transacoes_distribuidas.exceptions.ResourceAlreadyExists;
 import transacoes_distribuidas.exceptions.ResourceNotFoundException;
 
@@ -61,6 +62,11 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler(InvalidOperation.class)
+    public ResponseEntity<?> handleInvalidOperation(Exception ex, WebRequest request) {
+        ErrorDetailsResponse errorDetails = new ErrorDetailsResponse(ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request) {

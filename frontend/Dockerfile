@@ -34,6 +34,8 @@ EXPOSE 80
 CMD ["/bin/sh", "-c", "/usr/share/nginx/html/env.sh && nginx -g 'daemon off;'"]
 
 
-# docker build -t wolivej/front-app .
+# docker build -t wolivej/front-banco-app .
+
 # docker run -it -p 3000:80 -p 8080:8080 -e BANK_CODE=1 wolivej/front-app
+# docker run -it --network=host -e BANK_CODE=1 wolivej/front-app
 

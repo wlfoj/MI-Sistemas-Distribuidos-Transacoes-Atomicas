@@ -59,7 +59,6 @@ export default function Transfer() {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault(); // Para dar reload após o submit só retirar isso
 
         const accountResponse = {
             transactionType: "TRANSFER",
@@ -83,14 +82,14 @@ export default function Transfer() {
             ]
         };
 
-        console.log(accountResponse)
+
 
         Api.post("/user/openTransaction", accountResponse)
 
             .then((body) => {
                 console.log(body.data)
                 setError("");
-                setMessage(body.data.message);
+                setMessage("tid=" +body.data.tid + "   status="+body.data.transactionStatus);
                 setTimeout(() => {
                     setMessage("");
                 }, 15000)
@@ -100,6 +99,8 @@ export default function Transfer() {
                 setError("Erro: " + err);
                 console.log("Erro: " + err);
             });
+
+            e.preventDefault(); // Para dar reload após o submit só retirar isso
     };
 
     return (

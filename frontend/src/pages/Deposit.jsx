@@ -38,9 +38,9 @@ export default function Deposit() {
 
 
     const handleSubmit = (e) => {
-        e.preventDefault(); // Para dar reload após o submit só retirar isso
+        //
 
-        const accountResponse = {
+        const accountRequest = {
             transactionType: "DEPOSIT",
             source: {
                 "bankCode": bankId,
@@ -56,23 +56,24 @@ export default function Deposit() {
             ]
         };
 
-        console.log(accountResponse)
 
-        Api.post("/user/openTransaction", accountResponse)
+        Api.post("/user/openTransaction", accountRequest)
 
             .then((body) => {
-                console.log(body.data)
                 setError("");
-                setMessage(body.data.message);
+                setMessage("tid=" +body.data.tid + "   status="+body.data.transactionStatus);
                 setTimeout(() => {
                     setMessage("");
                 }, 15000)
 
             }).catch((err) => {
                 setMessage("");
+                console.log("teste")
                 setError("Erro: " + err);
                 console.log("Erro: " + err);
             });
+
+            e.preventDefault(); // Para dar reload após o submit só retirar isso
     };
 
     return (

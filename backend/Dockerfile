@@ -15,7 +15,8 @@ EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
 
 
-# docker build -t wolivej/banco-app .
+# docker build -t wolivej/back-banco-app .
+
 # docker run --network=host -it -e BANK_CODE=1  wolivej/banco-app
 
 

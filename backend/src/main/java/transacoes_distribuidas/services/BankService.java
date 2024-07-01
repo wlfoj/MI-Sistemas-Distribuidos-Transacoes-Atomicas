@@ -223,6 +223,7 @@ public class BankService {
                 if (! isValidPayment(req)){
                     throw new InvalidOperation("A transação de pagamento precisa ter somente operações do tipo saque. Não pode haver 2 operações com a mesma conta");
                 }
+
                 break;
         }
         // OQ FAZER QUANDO transaction FOR NULL??
@@ -353,8 +354,12 @@ public class BankService {
     private boolean isValidPayment(CreateTransactionRequest req){
         Set<String> seenOperations = new HashSet<>();// para ver se tem operação duplicada
         boolean hasDepositOp = false;
+        int i = -1;
+        int j = -1;
+
         // Só pode ter operação do tipo saque
         for (OperationRequest operation: req.operations) {
+            i =i+1;
             // Verifica se tem conta duplicada
             String combinedKey = operation.accountCode + operation.bankCode;
             if (!seenOperations.add(combinedKey)) {
@@ -367,12 +372,17 @@ public class BankService {
                 if (!operation.bankCode.equals("0")){
                     return false;
                 }
+                else{
+                    j = i;
+                }
             }
             // Se achei uma operação de deposito,mas já havia achado outra antes
             if (operation.operationType == OperationType.DEPOSIT && hasDepositOp == true) {
                 return false;
             }
         }
+        // Removendo a conta que tem o deposito no banco 0
+        req.operations.remove(j);
         return true;
     }
 
