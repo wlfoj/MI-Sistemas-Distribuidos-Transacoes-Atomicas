@@ -1,9 +1,9 @@
 package transacoes_distribuidas.infra;
 
 public enum Consortium {
-    BANK1("http://127.0.0.1:8080/", "1"),
-    BANK2("http://127.0.0.1:8081/", "2"),
-    BANK3("http://127.0.0.1:5000/", "3"),
+    BANK1("http://172.16.103.5:8080/", "1"),
+    BANK2("http://172.16.103.6:8080/", "2"),
+    BANK3("http://172.16.103.7:8080/", "3"),
     ;
 
     // TEM QUE LEMBRAR DE COLOCAR O IP DOS COMPUTADORES ONDE VAI PODER RODAR CADA BANCO

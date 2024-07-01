@@ -15,6 +15,7 @@ import transacoes_distribuidas.presenters.PresenterOperation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Esta classe representa o coordenador de uma transação com o 2PC, porém também faz o papel de intermediário da uma transação
@@ -32,6 +33,8 @@ public class TwoPhaseCommitCoordinator {
     private HttpService httpService;
     @Autowired
     private Bank bank;
+    @Autowired
+    private BlockingQueue<Retries> blockingQueueRetries;
 
     private HashMap<String, String> preparedLocal = new HashMap<>();// Contas que estão em fase de prepare localmente
     private final ReentrantLock lockPrepared = new ReentrantLock();// É um Mutex para a lista de contas
@@ -127,7 +130,6 @@ public class TwoPhaseCommitCoordinator {
                 logger.info(String.format("2PC OPEN - Realizando o COMMIT de operação{%s}", operationInTime.getOid()));
                 // VERIFICO SE CONSEGUI DAR COMMIT??????????????????????????????????????????????????????????????????????????????????
                 requestDoCommit(operationInTime); /** 2PC */
-
             }
             // Adiciona na lista de historico como concluida
             transaction.setTransactionStatus(TransactionStatus.CONCLUDED);
@@ -203,7 +205,7 @@ public class TwoPhaseCommitCoordinator {
      * @param operation
      * @return Em caso afirmativo deve retornar um responseNode = ResponseNode.COMMITTED
      */
-    public _2PCResponse requestDoCommit(Operation operation){
+    public _2PCResponse requestDoCommit(Operation operation) {
         _2PCResponse res = new _2PCResponse();
         res.oid = operation.getOid();
         String uri;
@@ -232,18 +234,39 @@ public class TwoPhaseCommitCoordinator {
         }
         // Se for em um banco externo
         else {
-            try{
-                uri = consortium.get(operation.getBankCode()).getBankUrl() + "bank/commit"; // Pega o uri do banco
-                logger.info(String.format("2PC COMMIT - Realizando COMMIT externo para operação{%s} - uri{%s}", operation.getOid(), uri));
+            uri = consortium.get(operation.getBankCode()).getBankUrl() + "bank/commit"; // Pega o uri do banco
+            logger.info(String.format("2PC COMMIT - Realizando COMMIT externo para operação{%s} - uri{%s}", operation.getOid(), uri));
+
+            // Bloco para enviar a requisição de commit
+            try {
                 _2PCResponse resNode =  this.httpService.post2PC( uri, PresenterOperation.modelToDto(operation));
-            } catch (Exception e){ // Se não consegui contatar o outro banco
-                res.responseNode = ResponseNode.NOT_CAN_COMMIT;
+                // Se eu não tiver recebido a informação de committed, lanço a exceção para tratar e colocar em retries
+                if (resNode.responseNode != ResponseNode.COMMITTED){
+                    throw new RuntimeException("");
+                }
+            // Se tiver algum erro, coloco em retries
+            } catch (Exception e) {
+                Retries r = new Retries();
+                r.uri = uri;
+                r.operation = operation;
+                // Coloca na fila de retries
+                try {
+                    this.blockingQueueRetries.put(r);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
+
         }
         return res;
     }
 
 
+    /** Caso a fase de prepare ocorra um erro, inicio a fase de abort. A mesma serve para liberar as travas nas contas.
+     *
+     * @param operation -> A operação só tem influência aqui para saber se a operação que quer liberar a trava é a mesma que colocou.
+     * @return
+     */
     public _2PCResponse requestDoAbort(Operation operation){
         String uri;
         _2PCResponse res = new _2PCResponse();
@@ -255,16 +278,32 @@ public class TwoPhaseCommitCoordinator {
             if ( aux.equals(operation.getOid()) ){
                 // Retira a trava da conta
                 this.preparedLocal.remove(operation.getAccountCode());
+                logger.info(String.format("2PC ABORT - A trava da conta{%s} operação{%s} foi retirada", operation.getAccountCode(), operation.getOid()));
             }
             else {
                 // Se a operação que está tentando destravar não for a mesma que fez a trava
+                logger.info(String.format("2PC ABORT - Só quem pode retirar a trava de conta{%s} é a operação que fez a trava", operation.getAccountCode()));
                 throw new InvalidOperation("Só quem pode retirar a trava é a operação que fez a trava");
             }
         }
         // Se for em um banco externo
         else {
             uri = consortium.get(operation.getBankCode()).getBankUrl() + "bank/abort"; // Pega o uri do banco
-            _2PCResponse aux = this.httpService.post2PC( uri, PresenterOperation.modelToDto(operation));
+            try{
+                _2PCResponse aux = this.httpService.post2PC( uri, PresenterOperation.modelToDto(operation));
+            // Se tiver algum erro, coloco em retries
+            } catch (Exception e) {
+                Retries r = new Retries();
+                r.uri = uri;
+                r.operation = operation;
+                // Coloca na fila de retries
+                try {
+                    this.blockingQueueRetries.put(r);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            logger.info(String.format("2PC ABORT - A trava da conta{%s} operação{%s} foi retirada", operation.getAccountCode(), operation.getOid()));
         }
         res.oid = operation.getOid();
         res.accountCode = operation.getAccountCode();
@@ -273,26 +312,3 @@ public class TwoPhaseCommitCoordinator {
         return res;
     }
 }
-
-/**
- * canCommit?(trans) → Sim / Não
- * Chamada do coordenador ao participante para perguntar se ele pode confirmar uma transação.
- * O participante responde com seu voto.
- *
- *
- * doCommit(trans)
- * Chamada do coordenador ao participante para dizer a ele para que confirme sua parte de
- * uma transação.
- *
- *
- * doAbort(trans)
- * Chamada do coordenador ao participante para dizer a ele para que cancele sua parte de uma transação.
- * haveCommitted(trans, participante)
- * Chamada do participante ao coordenador para confirmar que efetivou a transação.
- *
- *
- * getDecision(trans) → Sim/ Não
- * Chamada do participante ao coordenador para solicitar a decisão em uma transação, após ter votado
- * em Sim, mas ainda não ter recebido resposta devido a algum atraso. Usada para se recuperar de uma
- * falha de servidor ou de mensagens retardadas.
- */

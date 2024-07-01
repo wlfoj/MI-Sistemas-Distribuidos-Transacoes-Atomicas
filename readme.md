@@ -21,24 +21,18 @@ O sistema faz o uso do Java17+ e do React 18.3.1, porém o ambiente é construí
 ### 1. Faça pull das imagens utilizadas
 Abra o terminal e execute os comandos abaixo para baixar as imagens da API do Banco e da Interface gráfica no Doocker Hub.
 ```
-docker pull wolivej/banco-app
+docker pull wolivej/back-banco-app
 docker pull wolivej/front-banco-app
 ```
 
-### 2. Iniciando a API do Banco
-Para criar um nó (instância do banco), é necessário executar o container responsável por prover os serviços do banco. Execute o seguinte comando em um determinado computador. Onde há NUM_DO_BANCO, substitua pelo número que o banco deveria ter com base no  backend\src\main\java\transacoes_distribuidas\infra\Consortium.java.
+### 2. Iniciando o sistema
+Como o banco é entendido pelo conjunto da API e da interface gráfica, será preciso instância os dois serviços em um mesmo container. Sendo assim, basta acessar um computador, conforme a lista em 
+backend\src\main\java\transacoes_distribuidas\infra\Consortium.java e modificar o arquivo compose.yaml para que as váriaveis de ambiente BANK_CODE estejam coerentes com o ip do computador utilizado. Por exemplo, se você estiver no computador com ip 172.16.103.8 use o BANK_CODE=1. Feito isso, basta executar o código abaixo.
 ```
-docker run --network=host -it -e BANK_CODE={NUM_DO_BANCO}   wolivej/banco-app
+docker-compose up
 ```
 Repita o processo em cada computador diferente, se atentando aos que apresentam o ip especificado no arquivo de Consortium.java.
 
-
-### 3. Iniciando a interface gráfica
-Em um novo terminal, execute o comando, logo abaixo, para iniciar a aplicação gráfica para o banco. Este container deve ser iniciado no mesmo computador que o container do passo anterior (API do banco). Atribua o mesmo valor para NUM_DO_BANCO que foi utilizado no passo anterior.
-```
-docker run -it --network=host  -e BANK_CODE={NUM_DO_BANCO}  front-banco-app
-```
-Realize este passo para cada container com o serviço do banco (passo 2) iniciado.
 
 # 1. Introdução
 
