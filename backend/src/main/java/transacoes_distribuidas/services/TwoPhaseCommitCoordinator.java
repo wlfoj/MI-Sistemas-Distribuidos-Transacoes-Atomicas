@@ -80,26 +80,15 @@ public class TwoPhaseCommitCoordinator {
         /** ======================== FASE DE ABORT ======================== */
         if (nextState2PC == State2PC.ABORT){
             logger.info(String.format("2PC OPEN - Entrando na fase de ABORT transação{%s}", transaction.getTid()));
-            // Começo da anterior a dar falha pq, se tiver dado falha, o banco deverá liberar o lock antes de reportar a falha
-            for (j = i-1; j >= 0; j--) {
+            // Estou realizando um abort considerando oq falhou também só para para evitar um erro crítico
+            // Quando um nó cai antes de responder ao meu chamado. Ele terá processado e não saberá que caiu.
+            for (j = i; j >= 0; j--) {
                 // Obtem a operação que tem a vez
                 operationInTime = transaction.getOperations().get(j);
                 logger.info(String.format("2PC OPEN - Realizando o ABORT de operação{%s}", operationInTime.getOid()));
                 boolean inRetries = false;
                 // Se eu não conseguir fazer o abort, devo colocar uma fila de retries
-                try {
-                    requestDoAbort(operationInTime); /** 2PC */
-                } catch (Exception e){
-                    // Fico tentando colocar o retries na fila ????????????????????????????????????????????????????????????????????????
-                    while (inRetries == false){
-                        try{
-                            /** COLOCAR NO RETRIES AGR **/
-                            inRetries = true;
-                        } catch (Exception ex){
-
-                        }
-                    }
-                }
+                requestDoAbort(operationInTime); /** 2PC */
             }
             logger.info(String.format("2PC OPEN - Operação de ABORT transação{%s} com sucesso", transaction.getTid()));
             // SE TIVE DE FAZER UM ABORT POR CONTA DE UMA ESPERA
@@ -240,10 +229,6 @@ public class TwoPhaseCommitCoordinator {
             // Bloco para enviar a requisição de commit
             try {
                 _2PCResponse resNode =  this.httpService.post2PC( uri, PresenterOperation.modelToDto(operation));
-                // Se eu não tiver recebido a informação de committed, lanço a exceção para tratar e colocar em retries
-                if (resNode.responseNode != ResponseNode.COMMITTED){
-                    throw new RuntimeException("");
-                }
             // Se tiver algum erro, coloco em retries
             } catch (Exception e) {
                 Retries r = new Retries();
@@ -273,17 +258,25 @@ public class TwoPhaseCommitCoordinator {
 
         // Se for no banco atual/local
         if(operation.getBankCode().equals(Bank.getBankCode())){
-            // Verifico se a operação que quer remover a trava é a mesma que fez a trava
+
             String aux = this.preparedLocal.get(operation.getAccountCode());
-            if ( aux.equals(operation.getOid()) ){
-                // Retira a trava da conta
-                this.preparedLocal.remove(operation.getAccountCode());
-                logger.info(String.format("2PC ABORT - A trava da conta{%s} operação{%s} foi retirada", operation.getAccountCode(), operation.getOid()));
+            // Verifico se a conta está travada
+            if (aux !=  null){
+                // Verifico se a operação que quer remover a trava é a mesma que fez a trava
+                if ( aux.equals(operation.getOid()) ){
+                    // Retira a trava da conta
+                    this.preparedLocal.remove(operation.getAccountCode());
+                    logger.info(String.format("2PC ABORT - A trava da conta{%s} operação{%s} foi retirada", operation.getAccountCode(), operation.getOid()));
+                }
+                else {
+                    // Se a operação que está tentando destravar não for a mesma que fez a trava
+                    logger.info(String.format("2PC ABORT - Só quem pode retirar a trava de conta{%s} é a operação que fez a trava", operation.getAccountCode()));
+                    res.responseNode = ResponseNode.WITHOUT_AUTHORIZATION_TO_ABORT;
+                }
             }
-            else {
-                // Se a operação que está tentando destravar não for a mesma que fez a trava
-                logger.info(String.format("2PC ABORT - Só quem pode retirar a trava de conta{%s} é a operação que fez a trava", operation.getAccountCode()));
-                throw new InvalidOperation("Só quem pode retirar a trava é a operação que fez a trava");
+            // ESTE É UM CASO IMPORTANTE. POSSO RECEBER UM ABORT PARA UMA TRANSAÇÃO NÃO TRAVA, BUSCANDO GARANTIR A CONFIABILIDADE (VIDE RELATÓRIO)
+            else{
+                // Não faço nada aqui
             }
         }
         // Se for em um banco externo
