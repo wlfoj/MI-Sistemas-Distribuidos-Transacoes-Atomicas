@@ -26,32 +26,33 @@ docker pull wolivej/front-banco-app
 ```
 
 ### 2. Iniciando o sistema
-Como o banco é entendido pelo conjunto da API e da interface gráfica, será preciso instância os dois serviços em um mesmo container. Sendo assim, basta acessar um computador, conforme a lista em 
-backend\src\main\java\transacoes_distribuidas\infra\Consortium.java e modificar o arquivo compose.yaml para que as váriaveis de ambiente BANK_CODE estejam coerentes com o ip do computador utilizado. Por exemplo, se você estiver no computador com ip 172.16.103.8 use o BANK_CODE=1. Feito isso, basta executar o código abaixo.
+Como o banco é entendido pelo conjunto da API e da interface gráfica, será preciso instância os dois serviços em um mesmo container. Sendo assim, basta acessar um computador, conforme a lista em  backend\src\main\java\transacoes_distribuidas\infra\Consortium.java e modificar o arquivo compose.yaml para que as váriaveis de ambiente BANK_CODE estejam coerentes com o ip do computador utilizado. Por exemplo, se você estiver no computador com ip 172.16.103.8 use o BANK_CODE=1. Feito isso, basta executar o código abaixo.
 ```
 docker-compose up
 ```
 Repita o processo em cada computador diferente, se atentando aos que apresentam o ip especificado no arquivo de Consortium.java.
 
-
 # 1. Introdução
+O avanço da tecnologia tem possibilitado a integração de diversos dispositivos por meio da internet, proporcionando facilitações em atividades de diversas naturezas. A gerência de diversos dispositivos que estão distribuídos em nós pela internet se mostra uma complexidade a ser lidada quando se fala em Internet das Coisas (do inglês Internet of Things, IoT). Sistemas bancários em que não há a presença de uma unidade controladora central (como o Banco Central), são um verdadeiro desafio. Open Banking é o nome dado ao sistema onde bancos se unem e expões suas API's a outros (com autorização do cliente), para que um determinado cliente possa ter acesso a seus dados de diferente meios, tornando o dia a dia do cliente ainda mais prático. 
 
-O avanço da tecnologia tem possibilitado a integração de diversos dispositivos por meio da internet, proporcionando facilitações em atividades de diversas naturezas. A gerência de diversos dispositivos que estão distribuídos em nós pela internet se mostra uma complexidade a ser lidada quando se fala em Internet das Coisas (do inglês Internet of Things, IoT). Sistemas bancários onde não há a presença de uma unidade controladora central (como o Banco Central), são um verdadeiro desafio. Open Banking é o nome dado ao sistema onde bancos se unem e expões suas API's a outros (com autorização do cliente), para que um determinado cliente possa ter acesso a seus dados de diferente meios, tornando o dia a dia do cliente ainda mais prático. 
+Devido a natureza de sistemas distribuídos, os nós do sistema devem entrar em consenso e estabelecer um protocolo bem definido para troca de mensagens. Garantir que todos os nós de um sistema enxerguem o mesmo estado é uma tarefa nada trivial. Para garantir essa consistência e atomicidade se usa protocolos de transações atômicas, como o Two Phase Commit. Uma característica de sistemas distribuídos para transações que podem partir de qualquer nó é o uso da arquitetura peer-to-peer. 
 
-Devido a natureza de sistemas distribuídos, os nós do sistema devem entrar em consenso e estabelescer um protocolo bem definido para troca de mensagens. Garantir que todos os nós de um sistema enxerguem o mesmo estado é uma tarefa nada trivial. Para garantir essa consistência e atômicidade se usa protocolos de transações atômicas, como o Two Phase Commit.
+Aplicações peer-to-peer (P2P) são sistemas distribuídos que permitem a comunicação direta e o compartilhamento de recursos entre dispositivos conectados em uma rede, sem a necessidade de um servidor central. Em uma arquitetura P2P, cada nó (ou "peer") pode atuar tanto como cliente quanto como servidor, compartilhando e solicitando dados de outros nós.
 
+Diante do problema apresentado, foi proposto a implementação de um sistema distribuído onde há vários bancos, hosts diferentes, e usuários que podem realizar movimentação em qualquer uma de suas contas. O usuário deve ser capaz de se cadastrar em vários bancos do sistema e, por meio de qualquer banco, acessar todas as suas contas. O sistema deveria ser desenvolvido utilizando o protocolo HTTP para realizar as comunicações, porém foi permitido utilizar frameworks para o desenvolvimento de API e de interfaces gráficas single-page. 
 
-Diante do problema apresentado, foi proposto a implementação de um sistema distribuído onde há vários bancos, hosts diferentes, e um usuário pode realizar movimentação em qualquer uma de suas contas. o usário deve ser capaz de se cadastrar em vários bancos do sistema, e por meio de qualquer um banco acessar todas as suas contas. O sistema deveria ser desenvolvido utilizando o protocolo HTTP para realizar as comunicações, porém foi permitido utilizar frameworks para o desenvolvimento de API e de interfaces gráficas Single-Page. 
-O sistema desenvolvido possui 2 elementos principais: backend, o sistema que expõe os serviços realizados pelos bancos; frontend, a aplicação gráfica por meio da qual o usuário irá usufruir dos serviços bancaários. 
-o backend foi desenvolvido em Java17, Spring Boot, e o frontend em React 18. O relatório é dividido em 3 partes principais, excluindo a introdução e as etapas de como configurar o sistema, sendo elas: a visão geral do problema desenvolvido, as discussões detalhadas sobre a solução apresentada e as conclusões.
+O sistema desenvolvido possui 2 elementos principais: backend, o sistema que expõe os serviços realizados pelos bancos; frontend, a aplicação gráfica por meio da qual o usuário usufruirá dos serviços bancários. 
+O backend foi desenvolvido em Java17, Spring Boot, e o frontend em React 18. O relatório é dividido em 3 partes principais, excluindo a introdução e as etapas de como configurar o sistema, sendo elas: a visão geral do problema desenvolvido, as discussões detalhadas sobre a solução apresentada e as conclusões.
 
 
 # 2. Visão geral
 Em backend há os arquivos referentes ao serviço da API do banco. Em frontend há os arquivos referentes ao serviço da interface gráfica de um banco em questão. Fez-se o emprego do Docker, tanto na etapa de desenvolvimento quanto de produção, para isolar o sistema de eventuais problemas que podem ocorrer ao utilizar uma máquina compartilhada. O código do produto está comentado, exceto em nomes da variaveis e métodos auto-explicativos.
 
-Desenvolveu-se os sistema de frontend e backend com tecnologias diferentes, tendo em vista a facilidade de se encontrar informações para possíveis problemas que surgissem, além de um pequeno conhecimento prévio do desenvolvedor nesta abordagem. O frontend possui 8 telas, sendo elas: tela de login, tela de cadastro de conta física, tela de cadastro de conta jurídica, tela de cadastro de conta conjunta, tela inicial, tela de pagamentos, tela de depósito e tela de transferência.
+O sistema bancário desenvolido não utiliza a arquitetura peer-to-peer (2P2), onde um banco poderá ser tanto um cliente quanto um servidor em determinado momento. Por exemplo, quando um banco precisa perguntar aos demais se determinado cpf possui alguma conta registrada em cada um deles. Tal situação se repete quando um banco recebe uma requisição de transação e precisa comunicar os demais participantes.
 
-Para a utilização do sistema, o cliente deverá selecionar o banco que o mesmo deseja utilizar, acessando o endereço ao qual a interface do banco está exposta. O usuário, de um navgeador web, poderá acessar qualquer interface de qualquer banco por meio de requisições HTTP para a interface. Toda a comunicação entre o usuário, a aplicação frontend e a aplicação backend se dá por meio do protocolo HTTP. A **figura 1** ilustra o sistema desenvolvido.
+Desenvolveu-se os sistemas de frontend e backend com tecnologias diferentes, tendo em vista a facilidade de se encontrar informações para possíveis problemas que surgissem, além de um pequeno conhecimento prévio do desenvolvedor nesta abordagem. O frontend possui 8 telas, sendo elas: tela de login, tela de cadastro de conta física, tela de cadastro de conta jurídica, tela de cadastro de conta conjunta, tela inicial, tela de pagamentos, tela de depósito e tela de transferência.
+
+Para a utilização do sistema, o cliente deverá selecionar o banco que o mesmo deseja utilizar, acessando o endereço ao qual a interface do banco está exposta. O usuário, por meio de um navegador web, poderá acessar qualquer interface de qualquer banco por meio de requisições HTTP para a interface. Toda a comunicação entre o usuário, a aplicação frontend e a aplicação backend se dá por meio do protocolo HTTP. A **figura 1** ilustra o sistema desenvolvido. Em  resumo, o usuário acessa apenas a interface, visto que a mesma que encaminha suas solicitações para o banco.
 
 <p align="center"><b>Figura  1</b> - Diagrama da arquitetura da Solução</p>
 <p align="center">
@@ -59,32 +60,27 @@ Para a utilização do sistema, o cliente deverá selecionar o banco que o mesmo
 </p>
 <p align="center">Fonte: Autor</p>
 
-Uma operação é uma tarefa com objetivo de diminuir (saque) o saldo de um conta ou aumentar (deposito). Uma transação é conceituada como sendo um conjunto de operações que deve ser efetuada de forma atômica. As transações podem ser do tipo de pagamento, depósito ou transferência.
+Uma operação é uma tarefa com objetivo de diminuir o saldo (saque) de um conta ou aumentar (deposito). Uma transação é conceituada como sendo um conjunto de operações que deve ser efetuada de forma atômica. As transações podem ser do tipo de pagamento, depósito ou transferência.
 
 Uma transação de depósito envolve a inserção de dinheiro no sistema. Dado que o usuário está autenticado no sistema, ou seja, já fez login, o mesmo poderá realizar depósito em qualquer outra conta presente no sistema bancário. Sendo assim, tal operação deve envolver apenas uma operação de depósito.
 
-Uma transação de pagamento envolve a retirada de dinheiro do sistema. Dado que o usuário está autenticado no sistema, o mesmo poderá retirar parte de saldo de qualquer uma de suas contas, em qualquer banco, para realziar o pagamento. Não há nenhuma validação do pagamento, visto que o objetivo aqui é apenas o de retirar o dinheiro do sistema. Sendo assim, tal transação deve envolver apenas operações de saque.
+Uma transação de pagamento envolve a retirada de dinheiro do sistema. Dado que o usuário está autenticado no sistema, o mesmo poderá retirar parte de saldo de qualquer uma de suas contas, em qualquer banco, para realizar o pagamento. Não há nenhuma validação do pagamento, visto que o objetivo aqui é apenas o de retirar o dinheiro do sistema. Sendo assim, tal transação deve envolver apenas operações de saque.
 
-Uma transação de transferência realiza a movimentação de saldo de N contas para uma única de destino. O usuário poderá retirar dinheiro de qualquer, desde que seja sua, e enviar para qualquer conta no sistema. O saldo retirado deverá ser igual ao depositado.
+Uma transação de transferência realiza a movimentação de saldo de N contas para uma única de destino. O usuário poderá retirar dinheiro de qualquer conta, desde que seja sua, e enviar para qualquer conta no sistema. O saldo retirado deverá ser igual ao depositado.
 
-O sistema faz o uso de um protocolo de transações atômicas chamado Two Phase Commit. Desta forma, é garantido que todos os nós do sistema distribuído verão o mesmo estado global.
+O sistema faz o uso de um protocolo de transações atômicas chamado Two Phase Commit. Desta forma, busca-se garantir que todos os nós do sistema distribuído verão o mesmo estado global.
 
 
 # 3. Discussão sobre o produto
-O sistema desenvolvido busca apresentar uma solução para o sistema de banco distribuidos, sem um banco central coordenador, para a tarefa de realizar transferências, pagamentos de conta e depósitos entre contas. Um mesmo usuário pode acessar as contas em diferentes bancos, após realizar o login em determinado banco. Todos os bancos expõe uma API Restful, desenvolvida com Java Spring Boot 3, pela qual toda a comunicação (seja com cliente ou outro banco) é feita. Em cada nó do sistema deverá haver o aplicativo da interface frontend, desenvolvida com o React, e o aplicativo do backend executando. Sendo assim, cada computador do LARSID irá executar os dois processos para constituir um único nó. 
+O sistema desenvolvido busca apresentar uma solução para o sistema de banco distribuidos, sem um banco central coordenador, para a tarefa de realizar transferências, pagamentos de conta e depósitos entre contas. Um mesmo usuário pode movimentar saldo das contas em diferentes bancos, isto é, após realizar o login em determinado banco. Todos os bancos expõe uma API Restful, desenvolvida com Java Spring Boot 3, pela qual toda a comunicação (seja com cliente ou outro banco) é feita. Em cada nó do sistema deverá haver o aplicativo da interface frontend, desenvolvida com o React, e o aplicativo do backend executando (veja **figura 1**). Sendo assim, cada computador do LARSID executará os dois processos para constituir um único nó. 
 
-O serviço do banco possui uma thread para processamento exclusivo de transações, sempre que chega uma requisição de transação, a mesma será validada e depositada em fila para a thread consumir posteriormente.
+O serviço do banco possui uma thread para processamento exclusivo de transações. Sempre que chega uma requisição de transação no banco, a mesma será validada e depositada em fila para que a thread consuma posteriormente.
 
-Dentro do sistema, para torna-lo confiavél e roobusto, fez-se o uso de mutex para cada conta criada, impedindo que duas solicitações pudessem gerar algum problema no saldo de determinada conta ao concorrerem em uma operação. Com o uso do 2PC, caso uma conta esteja sendo utilizada em uma transação, a mesma ficará impossibilitada de participar de outra transação até que a mesma termine. Desta forma, lida-se com cenários de concorrência local ou distribuído.
+Dentro do sistema, para torná-lo confiável e robusto, fez-se o uso de mutex para cada conta criada, impedindo que duas solicitações pudessem gerar algum problema no saldo de determinada conta ao concorrerem em uma operação. Com o uso do 2PC, caso uma conta esteja sendo utilizada em uma transação, a mesma ficará impossibilitada de participar de outra transação até que a mesma termine. Desta forma, lida-se com cenários de concorrência local ou distribuído.
 
--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-O sistema foi desenvolvido para ser resiliente e confiável, conforme é exemplificado pelos padrões de resiliência adotados. Entretando há um cenário em que impacta o funcionamento do sistema.
-Caso um banco A inicie uma transação, chame o Prepare em um banco B (que foi bem sucedido), e seja desconectado em seguida, deixará a conta no banco B travada até que o banco A seja reconectado. Ao ser reconectado, o banco A irá iniciar o processo de abort em todos os participantes.
-Além da situação acima, há uma outra que não pôde ser tratada. Caso um banco A seja desconectado enquanto um banco B esteja processando a sua requisição de Prepare, o banco B não será capaz de identificar que o banco A caiu e irá tratar como se a operção estivesse ocorrido sem erros. 
-Do lado do banco A, será visto um erro devido ao timeout 
--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+O sistema desenvolvido permite ao usuário, por meio de telas na interface gráfica, a criação de contas, sendo elas: do tipo física (**figura 5**), do tipo conta conjunta (**figura 6**) ou do tipo conta jurídica (**figura 7**). É possível alterar apenas o saldo das contas, conforme discutido em sessão, não sendo necessário alterar nome da pessoa e data de nascimento por exemplo. Um usuário do sistema, desde que possua contas em outros bancos do sistema global, poderá utilizar destas contas para realizar transferências e pagamentos, conforme **figura 8** e **figura 9**.
 
-O sistema desenvolvido permite ao usuário, por meio de telas na interface gráfica, a criação de contas, sendo elas: do tipo fisíca (**figura 5**), do tipo conta conjunta (**figura 6**) ou do tipo conta jurídica (**figura 7**). É possível alterar apenas o saldo das contas, conforme discutido em sessão, não sendo necessário alterar nome da pessoa e data de nascimento por exemplo. Um usuário do sistema, desde que possua contas em outros bancos do sistema global, poderá utilizar destas contas para realizar transferências e pagamentos, conforme **figura 8** e **figura 9**.
+
 <p align="center"><b>Figura 5</b> - Tela cadastro conta física.</p>
 <p align="center">
   <img src="img\cadastro fisica.png" width='400px'>
@@ -115,35 +111,24 @@ O sistema desenvolvido permite ao usuário, por meio de telas na interface gráf
 </p>
 <p align="center">Fonte: Autor</p>
 
+O usuário poderá realizar deposito em qualquer conta do sistema (**figura 10**). O usuário poderá realizar pagamentos de qualquer natureza, mediante o código do pagamento. Tanto o pagamento quanto a transferência podem retirar dinheiro de todas as contas de um determinado usuário. Ao entrar na tela de pagamento ou transferência aparecerá as contas que o usuário deseja retirar dinheiro para transferir (serão apenas as suas próprias contas). O destino do pagamento ou da transferência é único, ou seja, não pode haver mais de uma conta de destino para as transferências. Caso o usuário opte por realizar transferências para várias contas, deverá fazer uma transação de transferência para cada conta de destino.
 
-O usuário poderá realizar deposito em qualquer conta do sistema (**figura 10**), mediante a inserção de dinheiro no sistema. O usuário  poderá realizar pagamentos de qualquer natureza, mediante o código do pagamento.
-Em resumo, tanto o pagamento quanto a transferência podem retirar dinheiro de todas as contas de um determinado usuário. O destino do pagamento ou da transferência é único, ou seja, não pode haver mais de uma conta de destino para as transferências.
-Caso o usuário opte por realizar transferências para varias contas, deverá fazer uma transação de transferência para cada conta de destino.
 <p align="center"><b>Figura 10</b> - Tela de depositos.</p>
 <p align="center">
   <img src="img\teladeposito.png" width='400px'>
 </p>
 <p align="center">Fonte: Autor</p>
 
-
-
-Todas as chamadas a API de um banco ocorrem de forma síncrona, exceto a de transações. Quando uma solicitação de transação é recebida, o banco avalia a requisição, buscando incoerências, e caso esteja incorreta irá responder uma mensagem de erro padrão (ver sessão de protocolos).
-Caso a transação recebida seja aprovada, a mesma é depositada em uma fila de transações cujo processamento se dará por uma outra thread. O processamento da transação em sí, na thread, é feito de forma síncrona, ou seja, é feita uma requisição para cada participante e aguarda-se a resposta. 
+Todas as chamadas a API de um banco ocorrem de forma síncrona, exceto a de transações. Quando uma solicitação de transação é recebida, o banco avalia a requisição, buscando incoerências, e caso esteja incorreta responderá uma mensagem de erro padrão (ver sessão de comunicação e protocolos). Caso a transação recebida seja aprovada, uma mensagem de aceitação é devolvida ao usuário, e a requisição é depositada em uma fila de transações cujo processamento se dará por uma outra thread. O processamento da transação em si, na thread, é feito de forma síncrona, ou seja, é feita uma requisição para cada participante e aguarda-se a resposta. 
 
 #### 3.1 Transação Atômica e 2PC
-Considerendo os padrões para uma transação atômica, escolheu-se utilizar o Two Phase Commit (2PC) para aplicação no sistema. Outras alternativas foram 
-consideradas, como SAGAS e o algoritmo de Ricart-Argwala. O SAGA não tem o foco em atômicidade de uma transação, isso é obtido por meio de uma atômicidade 
-eventual, e por isso não foi escolhido. O algoritmo de Ricart-Argwala trata todo o ambiente como uma região crítica distribuída. O 2PC não apresenta todo sua operação
-em conformidade com o conceito de transações atômicas distribuídas, e por isso foi o escolhido.  
+Considerando os padrões para uma transação atômica, escolheu-se utilizar o Two Phase Commit (2PC) para aplicação no sistema. Outras alternativas foram consideradas, como SAGAS e o algoritmo de Ricart-Argwala. O SAGA não tem o foco em atomicidade de uma transação, isso é obtido por meio de uma atomicidade eventual, e por isso não foi escolhido. O algoritmo de Ricart-Argwala trata todo o ambiente como uma região crítica distribuída. O 2PC não apresenta todo sua operação em conformidade com o conceito de transações atômicas distribuídas, e por isso foi o escolhido.  
 
-O Two Phase Commit é um protocolo conhecido de transações atômicas cujo principal objetivo é garantir que, ao fim de uma transação, todos os nós do sistema vejam o mesmo estado do todo.
-O 2PC apresenta 2 fases principais, mais uma etapa de erro. A primeira fase é chamada de Prepare, nesta fase o banco que iniciou a transação (é dito coordenador da transação) irá perguntar a todos os participantes da transação se eles conseguem realizar determinada operação. 
-Assim que um participante receber uma solicitação de Prepare, deverá realizar um lock da conta envolvida na transação, desta forma nenhuma outra operação poderá usar a mesma até que o lock seja removido.
-Caso todos os participantes aceitem realizar a operação, será iniciada a segunda fase. A segunda fase é chamada de Commit, e ao receber uma solicitação de Commit, o banco em questão deve de fato realizar a operação e retirar a trava colocada na conta (confome **figura 2**).
-Caso haja algum banco que sinalize que não poderá realizar a operação, na fase de Prepare, a fase de Abort é iniciada. Na fase de Abort envia-se um comando para todos os bancos envolvidos para retirarem as travas colocadas nas contas, conforme **figura 3** e **figura 4**.
-Na implementação adotada, caso uma mensagem não seja entregue e recebida dentro de 5 segundos em uma fase de Prepare, será tratada como uma falha e o abort será iniciado.
+O Two Phase Commit é um protocolo conhecido de transações atômicas cujo principal objetivo é garantir que, ao fim de uma transação, todos os nós do sistema vejam o mesmo estado do todo. O 2PC apresenta 2 fases principais, mais uma etapa de erro. A primeira fase é chamada de *prepare*, nesta fase o banco que iniciou a transação (dito coordenador da transação) perguntará a todos os participantes da transação se eles conseguem realizar determinada operação. Assim que um participante receber uma solicitação de *prepare*, deverá realizar uma trava da conta envolvida na transação, desta forma nenhuma outra operação poderá usar a mesma até que a trava seja removida. Caso todos os participantes aceitem realizar a operação, será iniciada a segunda fase. 
 
-Visando um maior controle sobre as operações realizadas, adotou-se um sistema de atribuição de identificadores globais. Uma transação possuí um identificador de transação (tid) de duas partes, a primeira identifica o código do banco em que ela foi gerada e a segunda parte identifica o número da transação nesse banco (como exemplo tid=1.44). Uma operação tem seu identificador de operação (oid) em 3 partes, as duas primeiras partes correspondem ao identificador da transação, a terceira parte diz respeito ao número da operação dentro da transação que ela faz parte (como exemplo oid=1.44.2).
+A segunda fase é chamada de *commit*, e ao receber uma solicitação de *commit*, o banco em questão deve de fato realizar a operação e retirar a trava colocada na conta (conforme **figura 2**). Caso haja algum banco que sinalize que não poderá realizar a operação, na fase de Prepare, a fase de *abort* é iniciada. Na fase de *abort*, envia-se um comando para todos os bancos envolvidos para retirarem as travas colocadas nas contas, conforme **figura 3** e **figura 4**. Na implementação adotada, caso uma mensagem não seja entregue e recebida dentro de 5 segundos em uma fase de Prepare, será tratada como uma falha e o *abort* será iniciado.
+
+Visando um maior controle sobre as operações realizadas, adotou-se um sistema de atribuição de identificadores globais. Uma transação possui um identificador de transação (tid) de duas partes, a primeira identifica o código do banco em que ela foi gerada e a segunda parte identifica o número da transação nesse banco (como exemplo, o tid 1.44 localiza a 44º transação do banco de id 1 ). Uma operação tem seu identificador de operação (oid) em 3 partes, as duas primeiras partes correspondem ao identificador da transação, a terceira parte diz respeito ao número da operação dentro da transação que ela faz parte (como exemplo, oid 1.44.2 localiza a 2º operação na 44º transação do banco de id 1).
 
 <p align="center"><b>Figura 2</b> - Exemplo de transação bem sucedida.</p>
 <p align="center">
@@ -167,18 +152,21 @@ Visando um maior controle sobre as operações realizadas, adotou-se um sistema 
 Para tentar tornar o sistem mais confiável e robusto, aplicou-se padrões de resiliência ao sistema, buscando sanar as principais falhas que podem ocorrer.
 
 ##### 3.2.1 Timeouts
-Ao realizar uma requisição para outro banco, a resposta esperada deverá ser recebida em até 5 segundos, caso contrário o banco que fez a solicitação 
-irá tratar o banco contatado como indisponível. Tal indisponibilidade de um participante de uma trannsação irá disparar um evento de rollback no banco que está coordenando a transação.
-
-Do lado do banco contatado, o mesmo gerência sua operação, ele perceba que sua resposta só ficou pronta após os 5 segundos, ele irá iniciar um processo de rollback na última operação realizada.
+Ao realizar uma requisição para outro banco, a resposta esperada deverá ser recebida em até 5 segundos, caso contrário o banco que fez a solicitação tratará o banco contatado como indisponível. Tal indisponibilidade de um participante de uma transação disparará um evento de *rollback* no banco que está coordenando a transação, ocasionando um abortar na transação.
 
 ##### 3.2.2 Novas tentativas (Retries)
-Quando uma tentativa de abort é realizada pelo banco que iniciou uma operação (banco A), mas o banco contatado (banco B) está fora do ar, a requisição do abort é colocada no fim de uma fila especial para tentativas de aborts na sequência. 
+Há uma thread especial que o único propósito é consumir uma fila de novas tentativas, para que assim possa executá-las. Caso a thread não consiga processar a nova tentativa com sucesso, a mesma é recolocada ao final da fila novamente. Não há novas tentativas caso algum nó falhe em receber a requisição na fase de prepare. Está sendo considerado que se uma requisição de *commit* ou *abort* for entregue, ela será processada.
 
-Quando uma tentativa de prepare é realizado pelo banco que iniciou a transação (banco A), mas o banco contatado (banco B) está com a conta sendo usada em outra operação, a transação do banco A é colocada no final da fila de processamento de transações para uma nova tentativa. E faço o abort das transações que já sofreram um prepare, para que elas fiquem livres para outras operações (garantindo que as contas não ficarão travadas).
+Quando uma mensagem de aborte não pode ser entregue, seja por indisponibilidade de do banco participante ou algum erro no banco coordenador da transação, a requisição é colocada em uma fila de *retries* (novas tentativas).
 
-Caso a transação esteja na fase de commit, todos os participantes disseram que poderão realizar a operação, e caso alguém falhe em receber o commit, o sistema fica tentando realizar o commit eternamente, visto que o único motivo para dar falha é um banco estar temporariamente fora do ar. Então caso o commit falhe, a mensagem será colocada em uma fila de retries
-junto com o caso das mensagens de abort. Um objeto retries possui todas as informações necessárias, como uri e operação.
+Quando, em uma requisição do prepare do 2PC, a resposta é que a conta já está sendo usada em outra transação, toda a transação sofre um aborte e a mesma é colocada ao final da fila de processamento de transações novamente. Desta forma, não considero que a transação falhou por ter alguma conta ocupada e nem mantenho todas as outras contas, envolvidas nas demais operações, travadas por conta disso.
+
+Considera-se que, quando um banco informa que ele poderá executar uma operação (fase de prepare), há uma garantia de que se receber a confirmação ele a executará. Logo, se o coordenador da transação não conseguir enviar a mensagem de confirmação, a mesma será colocada na fila de *retries*, como é feito com as mensagens de aborte.
+
+##### 3.2.3 Operações idempotentes
+Considerando que mensagens podem se perder e que erros podem acontecer no durante o processamento de mensagens, atribuiu-se características de idempotência a alguns endpoints chave. Os endpoints de *commit* e *abort* de foram pensados para não que sua duplicação não ocasione nenhum problema ao sistema.
+
+Imagine que durante o processamento de uma requisição de *abort* vinda do banco A, o banco B perdeu a conexão com a rede. No sistema desenvolvido, o banco B teria realizado o *abort*, porém o banco A não saberia disso, visto que o mesmo recebeu um time out da resposta. Tal fato leva o banco A a enviar novamente a requisição. Por conta desse exemplo, desenvolveu-se os tratamentos para as requisições de *abort* e *commit* para serem idempotentes. 
 
 # 4. Protocolos de Comunicações e Mensagens
 Todo o sistema se comunica por meio de mensagens json, recebidas por meio de uma API Rest. Os campos utilizados em cada mensagem enviada foram selecionados para serem autoexplicativos.
@@ -487,8 +475,8 @@ Segue um exemplo de resposta.
 
 
 # 5. Conclusão
-O produto desenvolvido atende aos requisitos apresentados na situação problema. Durante o processo de desenvolvimento, pode-se aprender sobre técnicas de redes e aplicadas em sistemas distribuídos (como a conectividade), e também características de sistemas com threads (como a concorrência local e distribuída).
+O produto desenvolvido atende aos principais requisitos apresentados na situação-problema. Durante o processo de desenvolvimento, pode-se aprender sobre técnicas de redes e aplicadas em sistemas distribuídos (como a conectividade), e também características de sistemas com threads e peer-to-peer (como a concorrência local e distribuída).
 
-Embora o sistema implementado atenda de forma eficaz o problema proposto, o mesmo pode ser melhorado em aspectos de algoritmos e na utilização de mais threads para o processamento de requisições de transações. Outro ponto a ser melhorado é a nomeação dos dispositivos e a descoberta de serviços, na solução apresentada é necessário especificar o endereço de cada serviço. Outro ponto a ser melhorado, seria a adoção de protocolos de segurança e criptografia.
+Embora o sistema implementado atenda de forma eficaz o problema proposto, o mesmo pode ser melhorado em aspectos de algoritmos e na utilização de mais threads para o processamento de requisições de transações. Outro ponto a ser melhorado é a nomeação dos dispositivos e a descoberta de serviços, na solução apresentada é necessário especificar o endereço de cada serviço. Outro ponto a ser melhorado, seria a adoção de protocolos de segurança e criptografia. Caso se utilize de um projeto totalmente assíncrono para as transações, a confiabilidade do sistema poderá ser aumentada, visto que o intervalo de tempo da falha crítica poderá ser menor.
 
-Diante do exposto, este projeto serviu para aprofundar os conhecimentos relativos a atômicidade e comunicação em sistemas distribuídos, como também serviu para aprimorar habilidades necessárias para uma formação profissional.
+Diante do exposto, este projeto serviu para aprofundar os conhecimentos relativos a atomicidade e comunicação em sistemas distribuídos, como também serviu para aprimorar habilidades necessárias para uma formação profissional.
