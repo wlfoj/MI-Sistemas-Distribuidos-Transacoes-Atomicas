@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import transacoes_distribuidas.dto.out.ResponseNode;
 import transacoes_distribuidas.dto.out._2PCResponse;
 import transacoes_distribuidas.exceptions.AccountInUse;
-import transacoes_distribuidas.exceptions.InvalidOperation;
 import transacoes_distribuidas.exceptions.ResourceNotFoundException;
 import transacoes_distribuidas.infra.Consortium;
 import transacoes_distribuidas.model.*;
@@ -284,6 +283,7 @@ public class TwoPhaseCommitCoordinator {
             uri = consortium.get(operation.getBankCode()).getBankUrl() + "bank/abort"; // Pega o uri do banco
             try{
                 _2PCResponse aux = this.httpService.post2PC( uri, PresenterOperation.modelToDto(operation));
+                logger.info(String.format("2PC ABORT - A trava da conta{%s} operação{%s} foi retirada", operation.getAccountCode(), operation.getOid()));
             // Se tiver algum erro, coloco em retries
             } catch (Exception e) {
                 Retries r = new Retries();
@@ -296,7 +296,6 @@ public class TwoPhaseCommitCoordinator {
                     throw new RuntimeException(ex);
                 }
             }
-            logger.info(String.format("2PC ABORT - A trava da conta{%s} operação{%s} foi retirada", operation.getAccountCode(), operation.getOid()));
         }
         res.oid = operation.getOid();
         res.accountCode = operation.getAccountCode();

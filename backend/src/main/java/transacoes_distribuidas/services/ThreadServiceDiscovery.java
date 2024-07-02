@@ -21,17 +21,16 @@ import java.util.Map;
  */
 public class ThreadServiceDiscovery extends Thread{
 
-    @Autowired
-    private Map<String, String> consortium;
+    private final Map<String, String> consortium;
     private static final Logger logger = LoggerFactory.getLogger(ThreadTransactionProcessor.class);
 
     private final WebClient webClient;
 
-    public ThreadServiceDiscovery(){
+    public ThreadServiceDiscovery(Map<String, String> consortium){
         // Cria o webclient próprio, para não usar o outro
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofSeconds(1)) // Timeout de resposta
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000) // Timeout de conexão
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000) // Timeout de conexão 1s
                 .doOnConnected(conn -> conn
                         .addHandlerLast(new ReadTimeoutHandler(1)) // Timeout de leitura
                         .addHandlerLast(new WriteTimeoutHandler(1)) // Timeout de escrita
@@ -40,6 +39,8 @@ public class ThreadServiceDiscovery extends Thread{
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
+
+        this.consortium = consortium;
     }
 
     /** Realiza uma requisição do tipo GET
@@ -81,8 +82,7 @@ public class ThreadServiceDiscovery extends Thread{
                     ipToDiscovery = ipToDiscovery + String.valueOf(i); // Resulta em "172.16.103.1" por exemplo ...
                     // Se o ip for o mesmo da máquina que está executando este código
                     if (! ipToDiscovery.equals(ip)){
-                        //uri = "http://"+ipToDiscovery+":8080/bank/serviceDiscovery"; // http://172.16.103.1:8080/bank/serviceDiscovery
-                        uri = "http://"+"127.0.0.1"+":808"+ String.valueOf(i) +"/bank/serviceDiscovery";
+                        uri = "http://"+ipToDiscovery+":8080/bank/serviceDiscovery"; // http://172.16.103.1:8080/bank/serviceDiscover
                         try{
                             logger.info(String.format("SERVICE DISCOVERY - Iniciando a busca por %s", uri));
                             ServiceDiscoveryResponse res = this.discoveryServices(uri);

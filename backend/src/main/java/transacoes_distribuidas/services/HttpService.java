@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import transacoes_distribuidas.dto.out.AccountsResponse;
-import transacoes_distribuidas.dto.out.ServiceDiscoveryResponse;
 import transacoes_distribuidas.dto.out._2PCResponse;
 
 @Service

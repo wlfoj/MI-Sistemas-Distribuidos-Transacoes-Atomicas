@@ -4,7 +4,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import transacoes_distribuidas.model.Bank;
+import transacoes_distribuidas.model.Retries;
+import transacoes_distribuidas.model.Transaction;
+import transacoes_distribuidas.services.ThreadRetriesProcessor;
 import transacoes_distribuidas.services.ThreadServiceDiscovery;
+import transacoes_distribuidas.services.ThreadTransactionProcessor;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 @Configuration
@@ -20,14 +27,41 @@ public class AppConfig {
     }
 
 
-
-
-    /**
     @Bean
-    public ThreadServiceDiscovery consumerServiceDiscovery() {
-        ThreadServiceDiscovery consumer = new ThreadServiceDiscovery();
+    public BlockingQueue<Transaction> blockingQueue() {
+        return new LinkedBlockingQueue<>(64);
+    }
+
+    @Bean
+    public BlockingQueue<Retries> blockingQueueRetries() {
+        return new LinkedBlockingQueue<>(128);
+    }
+
+    @Bean
+    public ThreadTransactionProcessor consumerTransaction(BlockingQueue<Transaction> queue) {
+        ThreadTransactionProcessor consumer = new ThreadTransactionProcessor(queue);
         new Thread(consumer).start(); // Inicia o consumidor
         return consumer;
     }
+
+    @Bean
+    public ThreadRetriesProcessor consumerRetries(BlockingQueue<Retries> queue) {
+        ThreadRetriesProcessor consumer = new ThreadRetriesProcessor(queue);
+        new Thread(consumer).start(); // Inicia o consumidor
+        return consumer;
+    }
+
+
+    /**
+
+     @Bean
+     public Map<String, String> consortiumMapString(){ return = new HashMap<String, String>(); }
+
+     @Bean
+     public ThreadServiceDiscovery consumerServiceDiscovery(Map<String, String> consortiumMapString) {
+        ThreadServiceDiscovery consumer = new ThreadServiceDiscovery(consortiumMapString);
+        new Thread(consumer).start(); // Inicia o consumidor
+        return consumer;
+     }
     */
 }
