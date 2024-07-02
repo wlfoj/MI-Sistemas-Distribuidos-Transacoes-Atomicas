@@ -24,7 +24,7 @@ public class QueueConfig {
 
     @Bean
     public BlockingQueue<Retries> blockingQueueRetries() {
-        return new LinkedBlockingQueue<>(64);
+        return new LinkedBlockingQueue<>(128);
     }
 
     @Bean

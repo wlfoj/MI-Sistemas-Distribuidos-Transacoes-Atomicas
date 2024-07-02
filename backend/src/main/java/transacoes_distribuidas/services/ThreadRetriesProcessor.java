@@ -33,6 +33,7 @@ public class ThreadRetriesProcessor extends Thread{
 
                 try{
                     _2PCResponse res = this.httpService.post2PC(retries.uri, retries.operation);
+                    logger.info(String.format("ASYNC RETRIES- Entrega feita com sucesso de oid{%s} para uri{%s}", retries.operation.getOid(), retries.uri));
                 }catch (Exception e){// Se deu algum erro, coloco novamente
                     logger.info(String.format("ASYNC RETRIES- Adicionei o retries na fila novamente, devido a uma erro na entrega. oid{%s} para uri{%s}", retries.operation.getOid(), retries.uri));
                     this.queue.put(retries);
