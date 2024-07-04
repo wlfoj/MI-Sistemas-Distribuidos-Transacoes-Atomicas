@@ -7,7 +7,6 @@ import transacoes_distribuidas.model.Bank;
 import transacoes_distribuidas.model.Retries;
 import transacoes_distribuidas.model.Transaction;
 import transacoes_distribuidas.services.ThreadRetriesProcessor;
-import transacoes_distribuidas.services.ThreadServiceDiscovery;
 import transacoes_distribuidas.services.ThreadTransactionProcessor;
 
 import java.util.concurrent.BlockingQueue;
@@ -50,18 +49,5 @@ public class AppConfig {
         new Thread(consumer).start(); // Inicia o consumidor
         return consumer;
     }
-
-
-    /**
-
-     @Bean
-     public Map<String, String> consortiumMapString(){ return = new HashMap<String, String>(); }
-
-     @Bean
-     public ThreadServiceDiscovery consumerServiceDiscovery(Map<String, String> consortiumMapString) {
-        ThreadServiceDiscovery consumer = new ThreadServiceDiscovery(consortiumMapString);
-        new Thread(consumer).start(); // Inicia o consumidor
-        return consumer;
-     }
-    */
+    
 }
