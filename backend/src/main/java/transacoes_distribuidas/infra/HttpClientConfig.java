@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+import transacoes_distribuidas.exceptions.ConnectTimeOut;
+import transacoes_distribuidas.exceptions.ReadTimeOut;
 
 import java.time.Duration;
 
@@ -26,6 +28,17 @@ public class HttpClientConfig {
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .filter((request, next) -> next.exchange(request)
+                        .doOnError(throwable -> {
+                            if (throwable.getCause() instanceof io.netty.handler.timeout.ReadTimeoutException) {
+                                throw new ReadTimeOut("TimeOut de leitura e escrita");
+                            } else if (throwable.getCause() instanceof io.netty.channel.ConnectTimeoutException) {
+                                throw new ConnectTimeOut("Falha ao conectar ao host");
+                            } else {
+                                throw new RuntimeException("Outro erro", throwable);
+                            }
+                        })
+                )
                 .build();
     }
 }
