@@ -49,5 +49,5 @@ public class AppConfig {
         new Thread(consumer).start(); // Inicia o consumidor
         return consumer;
     }
-    
+
 }

@@ -353,7 +353,7 @@ public class BankService {
      */
     private boolean isValidPayment(CreateTransactionRequest req){
         Set<String> seenOperations = new HashSet<>();// para ver se tem operação duplicada
-        boolean hasDepositOp = false;
+        boolean aux = false;
         int i = -1;
         int j = -1;
 
@@ -367,50 +367,26 @@ public class BankService {
             }
 
             // Se achei uma operação de deposito, mas é a primeira que encontro
-            if (operation.operationType == OperationType.DEPOSIT && hasDepositOp == false){
+            if (operation.operationType == OperationType.DEPOSIT && aux == false){
                 // Verifico se os campos não são 0 e 0
-                if (!operation.bankCode.equals("0")){
-                    return false;
+                if (operation.bankCode.equals("0")){
+                    req.operations.remove(i);
+                    aux = true;
+                    return true;
                 }
                 else{
-                    j = i;
+                    return false;
                 }
             }
             // Se achei uma operação de deposito,mas já havia achado outra antes
-            if (operation.operationType == OperationType.DEPOSIT && hasDepositOp == true) {
+            if (operation.operationType == OperationType.DEPOSIT && aux == true) {
+                //req.operations.remove(i); Nem precisa se dar ao trabalho de remover, já está errado
                 return false;
             }
         }
         // Removendo a conta que tem o deposito no banco 0
-        req.operations.remove(j);
+
         return true;
-    }
-
-
-    /** Utilizado para a descoberta de IP. Só monto uma estrutura de resposta com meus dados para quem estiver interessado
-     *
-     * @return o código do banco, o ip atual e a porta onde o serviço está ouvindo.
-     */
-    public ServiceDiscoveryResponse serviceDiscovery(){
-        ServiceDiscoveryResponse res = new ServiceDiscoveryResponse();
-        String ip = null;
-        try {
-            ip = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        res.bankCode = Bank.getBankCode();
-        res.ip = ip;
-        res.port = "8080";
-        return res;
-    }
-
-    /** Função auxiliar para debug do service discovery
-     *
-     * @return
-     */
-    public String showConsortium(){
-        return this.consortium2.toString();
     }
 
 }
