@@ -78,31 +78,4 @@ public class BankController {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
-
-
-    // ============================================================================================================= //
-    // ============================ ENDPOINTS USADOS PARA A DESCOBERTA DE SERVIÇO ================================== //
-    // ============================================================================================================= //
-    // Ambos os métodos não puderam ser testados
-    /** Usado para informar quem quiser saber sobre o meu serviço. Solicitado pelo Service Discovery.
-     *
-     * @return
-     */
-    @Deprecated
-    @GetMapping("/serviceDiscovery")
-    public ResponseEntity<ServiceDiscoveryResponse> serviceDiscovery(){
-        ServiceDiscoveryResponse res = this.bankService.serviceDiscovery();
-        return ResponseEntity.status(HttpStatus.OK).body(res);
-    }
-
-    /** Usado para informar os serviços que foram encontrados
-     *
-     * @return
-     */
-    @Deprecated
-    @GetMapping("/showServices")
-    public ResponseEntity<String> showServices(){
-        String res = this.bankService.showConsortium();
-        return ResponseEntity.status(HttpStatus.OK).body(res);
-    }
 }
