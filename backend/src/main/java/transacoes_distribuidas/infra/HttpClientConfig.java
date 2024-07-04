@@ -19,11 +19,11 @@ public class HttpClientConfig {
     @Bean
     public WebClient webClient() {
         HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(5)) // Timeout de resposta
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000) // Timeout de conexão
+                .responseTimeout(Duration.ofSeconds(2)) // Timeout de resposta
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 2000) // Timeout de conexão
                 .doOnConnected(conn ->
-                        conn.addHandlerLast(new ReadTimeoutHandler(5)) // Timeout de leitura
-                                .addHandlerLast(new WriteTimeoutHandler(5)) // Timeout de escrita
+                        conn.addHandlerLast(new ReadTimeoutHandler(2)) // Timeout de leitura
+                                .addHandlerLast(new WriteTimeoutHandler(2)) // Timeout de escrita
                 );
 
         return WebClient.builder()
