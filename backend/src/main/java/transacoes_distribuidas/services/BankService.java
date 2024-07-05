@@ -233,6 +233,7 @@ public class BankService {
         // Monta a resposta
         res.tid = transaction.getTid();
         res.transactionStatus = transaction.getTransactionStatus();
+        this.bank.addHistoryTransactions(transaction);
         // Coloca a transação na fila que será processada
         this.blockingQueue.put(transaction);
         logger.info(String.format("SERVICE TRANSACTION REQUEST - A transação{%s} foi adicionada na fila para processamento", transaction.getTid()));
