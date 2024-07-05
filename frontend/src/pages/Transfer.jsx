@@ -28,6 +28,7 @@ export default function Transfer() {
 
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [tid, setTid] = useState("");
 
 
     useEffect(() => { // Função para pegar a tela de transação
@@ -90,6 +91,7 @@ export default function Transfer() {
                 console.log(body.data)
                 setError("");
                 setMessage("tid=" +body.data.tid + "   status="+body.data.transactionStatus);
+                setTid(body.data.tid);
                 setTimeout(() => {
                     setMessage("");
                 }, 15000)
@@ -121,8 +123,11 @@ export default function Transfer() {
                     {error ? (
                         <Alert size="sm" variant="danger">{error}</Alert>
                     ) : null}
+
                     {message ? (
-                        <Alert size="sm" variant="success"> {message} </Alert>
+                        <Alert size="sm" variant="success"> 
+                            {message} - <Link to={`/transaction/${tid}`}>Click here to view transaction status</Link>
+                        </Alert>
                     ) : null}
                 </Row>
 

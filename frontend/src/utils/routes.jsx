@@ -9,6 +9,8 @@ import Home from '../pages/Home';
 import Payment from '../pages/Payment';
 import Deposit from '../pages/Deposit';
 import Transfer from '../pages/Transfer';
+import TransactionStatus from '../pages/TransactionStatus';  // Importando o novo componente
+
 
 
 const Routes = () => (
@@ -23,7 +25,7 @@ const Routes = () => (
 			<Route exact path="/payment" component={Payment} />
 			<Route exact path="/deposit" component={Deposit} />
 			<Route exact path="/transfer" component={Transfer} />
-
+			<Route exact path="/transaction/:tid" component={TransactionStatus} />  {/* Nova rota */}
 		</Switch>
 	</BrowserRouter>
 );

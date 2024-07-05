@@ -30,6 +30,7 @@ export default function Payment() {
 
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [tid, setTid] = useState("");
 
 
     useEffect(() => { // Função para pegar a tela de transação
@@ -91,6 +92,7 @@ export default function Payment() {
                 console.log(body.data)
                 setError("");
                 setMessage("tid=" +body.data.tid + "   status="+body.data.transactionStatus);
+                setTid(body.data.tid);
                 setTimeout(() => {
                     setMessage("");
                 }, 15000)
@@ -117,12 +119,15 @@ export default function Payment() {
                     </Col>
                 </Row>
                 <Row style={{ padding: '1rem' }}>
-                    <h1 className="display-6" style={{ textAlign: 'center' }}> Pagamento </h1>
+                    <h1 className="display-6" style={{ textAlign: 'center' }}> Transferência </h1>
                     {error ? (
                         <Alert size="sm" variant="danger">{error}</Alert>
                     ) : null}
+
                     {message ? (
-                        <Alert size="sm" variant="success"> {message} </Alert>
+                        <Alert size="sm" variant="success"> 
+                            {message} - <Link to={`/transaction/${tid}`}>Click here to view transaction status</Link>
+                        </Alert>
                     ) : null}
                 </Row>
 
