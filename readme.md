@@ -26,6 +26,11 @@ docker pull wolivej/front-banco-app
 ```
 
 ### 2. Iniciando o sistema
+Faça um dowload do arquivo compose.
+```
+wget -O compose.yaml https://raw.githubusercontent.com/wlfoj/MI-Sistemas-Distribuidos-Transacoes-Atomicas/main/compose.yaml
+```
+
 Como o banco é entendido pelo conjunto da API e da interface gráfica, será preciso instância os dois serviços em um mesmo container. Sendo assim, basta acessar um computador, conforme o arquivo backend\src\main\java\transacoes_distribuidas\infra\Consortium.java, e criar o nó com o código correto associado. Para que as váriaveis de ambiente BANK_CODE estejam coerentes com o ip do computador utilizado, se você estiver no computador com ip 172.16.103.8 use o CODIGO_DO_BANCO=1. Execute o código abaixo com devida atenção.
 ```
 export BANK_CODE={CODIGO_DO_BANCO}
