@@ -4,7 +4,7 @@ FROM maven:3.8.3-openjdk-17-slim AS build
 WORKDIR /app
 COPY . .
 # Compila a aplicação
-RUN mvn clean install -DskipTests
+RUN mvn clean install -DskipTests -Dmaven.test.skip=true -Dmaven.build.dest=/app/target
 
 # Final Stage
 FROM openjdk:17-slim
