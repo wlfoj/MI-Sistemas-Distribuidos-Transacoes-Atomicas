@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # URLs da API
-BANK_URL1=""http://172.16.103.5:8080/""
-BANK_URL2=""http://172.16.103.6:8080/""
-BANK_URL3=""http://172.16.103.7:8080/""
+BANK_URL1=""http://172.16.103.10:8080/""
+BANK_URL2=""http://172.16.103.11:8080/""
+BANK_URL3=""http://172.16.103.12:8080/""
 
 # Nome dos Bancos
 BANK_CODE1="1"
