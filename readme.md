@@ -31,12 +31,20 @@ Faça um dowload do arquivo compose.
 wget -O compose.yaml https://raw.githubusercontent.com/wlfoj/MI-Sistemas-Distribuidos-Transacoes-Atomicas/main/compose.yaml
 ```
 
-Como o banco é entendido pelo conjunto da API e da interface gráfica, será preciso instância os dois serviços em um mesmo container. Sendo assim, basta acessar um computador, conforme o arquivo backend\src\main\java\transacoes_distribuidas\infra\Consortium.java, e criar o nó com o código correto associado. Para que as váriaveis de ambiente BANK_CODE estejam coerentes com o ip do computador utilizado, se você estiver no computador com ip 172.16.103.8 use o CODIGO_DO_BANCO=1. Execute o código abaixo com devida atenção.
+Como o banco é entendido pelo conjunto da API e da interface gráfica, será preciso instância os dois serviços em um mesmo container. BANK_STRUCT é a variável de ambiente que indica o endereço de cada banco. Sendo assim, atribua o valor da variavel conforme o exemplo abaixo.
+```
+export BANK_STRUCT= '[{\"bankCode\": \"1\", \"url\": \"http://127.0.0.1:8080/\"}, {\"bankCode\": \"2\", \"url\": \"http://127.0.0.1:8081/\"}, {\"bankCode\": \"3\", \"url\": \"http://127.0.0.1:8082/\"}]'
+```
+
+Cada elemento da lista corresponde a informação de onde um nó vai estar localizado (deverá ter um computador em cada endereço). Todos os bancos devem ser iniciados com o mesmo valor para as variaveis de ambiente. CODIGO_DO_BANCO deverá ser o bankCode do computador que representa o nó que está sendo iniciado no momento.
+
+Conforme a explicação sobre os valores das variaveis, execute o código abaixo para iniciar o nó.
 ```
 export BANK_CODE={CODIGO_DO_BANCO}
+export BANK_STRUCT={ESTRUTURA_DO_BANCO}
 docker-compose up
 ```
-Repita o processo em cada computador diferente, se atentando aos que apresentam o ip especificado no arquivo de Consortium.java.
+Repita o processo em cada computador diferente, se atentando aos que apresentam o ip especificado em ESTRUTURA_DO_BANCO.
 
 # 1. Introdução
 O avanço da tecnologia tem possibilitado a integração de diversos dispositivos por meio da internet, proporcionando facilitações em atividades de diversas naturezas. A gerência de diversos dispositivos que estão distribuídos em nós pela internet se mostra uma complexidade a ser lidada quando se fala em Internet das Coisas (do inglês Internet of Things, IoT). Sistemas bancários em que não há a presença de uma unidade controladora central (como o Banco Central), são um verdadeiro desafio. Open Banking é o nome dado ao sistema onde bancos se unem e expões suas API's a outros (com autorização do cliente), para que um determinado cliente possa ter acesso a seus dados de diferente meios, tornando o dia a dia do cliente ainda mais prático. 
@@ -53,6 +61,10 @@ O backend foi desenvolvido em Java17, Spring Boot, e o frontend em React 18. O r
 
 # 2. Visão geral
 Em backend há os arquivos referentes ao serviço da API do banco. Em frontend há os arquivos referentes ao serviço da interface gráfica de um banco em questão. Fez-se o emprego do Docker, tanto na etapa de desenvolvimento quanto de produção, para isolar o sistema de eventuais problemas que podem ocorrer ao utilizar uma máquina compartilhada. O código do produto está comentado, exceto em nomes da variaveis e métodos auto-explicativos.
+
+
+============================Breve explicação dos pacotes =========
+============================Breve explicação dos pacotes =========
 
 O sistema bancário desenvolido não utiliza a arquitetura peer-to-peer (2P2), onde um banco poderá ser tanto um cliente quanto um servidor em determinado momento. Por exemplo, quando um banco precisa perguntar aos demais se determinado cpf possui alguma conta registrada em cada um deles. Tal situação se repete quando um banco recebe uma requisição de transação e precisa comunicar os demais participantes.
 

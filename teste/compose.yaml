@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  front-app:
+    image: wolivej/front-banco-app
+    environment:
+      - BANK_CODE=${BANK_CODE}
+      - BANK_STRUCT=${BANK_STRUCT}
+    ports:
+      - "3000:80"

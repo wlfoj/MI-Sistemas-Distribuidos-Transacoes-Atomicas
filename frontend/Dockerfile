@@ -24,13 +24,17 @@ COPY --from=build /app/build /usr/share/nginx/html
 # Copia o script para injetar variáveis de ambiente
 COPY ./env.sh /usr/share/nginx/html/env.sh
 
-# Adiciona permissão de execução ao script
-RUN chmod +x /usr/share/nginx/html/env.sh
-
 # Expõe a porta 80
 EXPOSE 80
 
+# Copia o script de entrada
+COPY ./entrypoint.sh /entrypoint.sh
+
+# Adiciona permissão de execução aos scripts
+RUN chmod +x /usr/share/nginx/html/env.sh /entrypoint.sh
+
 # Inicia o nginx com o script de ambiente
+# ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/sh", "-c", "/usr/share/nginx/html/env.sh && nginx -g 'daemon off;'"]
 
 
