@@ -98,7 +98,8 @@ export default function Deposit() {
 
                     {message ? (
                         <Alert size="sm" variant="success"> 
-                            {message} - <Link to={`/transaction/${tid}`}>Click here to view transaction status</Link>
+                            {message} 
+                            {/* {message} - <Link to={`/transaction/${tid}`}>Click here to view transaction status</Link> */}
                         </Alert>
                     ) : null}
                 </Row>
