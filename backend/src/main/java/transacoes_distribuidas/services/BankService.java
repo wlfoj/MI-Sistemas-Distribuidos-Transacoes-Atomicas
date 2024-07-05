@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import transacoes_distribuidas.exceptions.InvalidOperation;
 import transacoes_distribuidas.exceptions.NullFields;
-import transacoes_distribuidas.infra.Consortium;
 import transacoes_distribuidas.dto.in.*;
 import transacoes_distribuidas.dto.out.*;
 
@@ -26,9 +25,7 @@ public class BankService {
     @Autowired
     private Bank bank;
     @Autowired
-    private Map<String, Consortium> consortium;
-    @Autowired
-    private Map<String, String> consortium2;
+    private Map<String, String> consortium;
     @Autowired
     private HttpService httpService;
 
@@ -134,12 +131,12 @@ public class BankService {
         String uri;
         AccountsResponse aux;
         // vou sair pedindo a todos os bancos do consorcio
-        Consortium[] allConsortiums = Consortium.getAllConsortiums();
-        for (Consortium consortium: allConsortiums) {
-            logger.info(String.format("ACCOUNTS - Solicitando as contas que usuario{%s} pode acessar para banco{%s}", id, consortium.getBankCode()));
+        Set<String> allConsortiums = consortium.keySet();
+        for (String consortiumCode: allConsortiums) {
+            logger.info(String.format("ACCOUNTS - Solicitando as contas que usuario{%s} pode acessar para banco{%s}", id, consortiumCode));
             try{
                 // Se eu estiver analisando o elemento que seja eu mesmo
-                if (consortium.getBankCode().equals(this.bank.getBankCode())){
+                if (consortiumCode.equals(this.bank.getBankCode())){
                     // Chamo o método que busca interno
                     aux = getAccountsIn(id);
                     // Pego tudo que achei e jogo na resposta
@@ -148,7 +145,7 @@ public class BankService {
                 // Se estiver analisando outro banco
                 else{
                     // Monto a uri
-                    uri  = consortium.getBankUrl() + "bank/accountsIn/" + id;
+                    uri  = consortium.get(consortiumCode) + "bank/accountsIn/" + id;
                     // Faço a requisição e trato
                     aux = this.httpService.getAccountsResponseData(uri);
                     // Pego tudo que achei e jogo na resposta
@@ -157,9 +154,6 @@ public class BankService {
                 }
             } catch (Exception e){
                 System.out.println(e.getMessage());
-                //System.out.println(e.toString());
-                //e.printStackTrace();
-                // Se deu algum erro, não faz nada
             }
         }
         if (resp.accountsToUse.size() == 0){

@@ -8,7 +8,6 @@ import transacoes_distribuidas.dto.out.ResponseNode;
 import transacoes_distribuidas.dto.out._2PCResponse;
 import transacoes_distribuidas.exceptions.AccountInUse;
 import transacoes_distribuidas.exceptions.ResourceNotFoundException;
-import transacoes_distribuidas.infra.Consortium;
 import transacoes_distribuidas.model.*;
 import transacoes_distribuidas.presenters.PresenterOperation;
 
@@ -27,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Component
 public class TwoPhaseCommitCoordinator {
     @Autowired
-    private Map<String, Consortium> consortium;
+    private Map<String, String> consortium;
     @Autowired
     private HttpService httpService;
     @Autowired
@@ -45,7 +44,7 @@ public class TwoPhaseCommitCoordinator {
      * @param transaction
      */
     public void openTransaction(Transaction transaction){
-        logger.info(String.format("2PC OPEN - Iniciando a transação{%s}", transaction.getTid()));
+        logger.info(String.format("2PC OPEN - Iniciando a transação{%s} com %d operações", transaction.getTid(), transaction.getOperations().size()));
         //boolean isAvaliableToCommit = true; // Variavel auxiliar que vai me auxiliar a entender se o nó votou SIM para a operação
         boolean accountWaiting = false; // Para informar se estou esperando uma conta em espera
         Operation operationInTime = null; // É a operação que estou processando
@@ -67,7 +66,7 @@ public class TwoPhaseCommitCoordinator {
                 break;
             }
             // Se deu um erro em algum aqui, não envia o pedido para os demais e já começa a abortar os que já receberam
-            if (aux.responseNode != ResponseNode.YES_CAN_COMMIT){
+            else if (aux.responseNode != ResponseNode.YES_CAN_COMMIT){
                 nextState2PC = State2PC.ABORT;
                 break;
             }
@@ -85,12 +84,11 @@ public class TwoPhaseCommitCoordinator {
                 // Obtem a operação que tem a vez
                 operationInTime = transaction.getOperations().get(j);
                 logger.info(String.format("2PC OPEN - Realizando o ABORT de operação{%s}", operationInTime.getOid()));
-                boolean inRetries = false;
                 // Se eu não conseguir fazer o abort, devo colocar uma fila de retries
                 requestDoAbort(operationInTime); /** 2PC */
             }
-            logger.info(String.format("2PC OPEN - Operação de ABORT transação{%s} com sucesso", transaction.getTid()));
-            // SE TIVE DE FAZER UM ABORT POR CONTA DE UMA ESPERA
+            logger.info(String.format("2PC OPEN - Operação de ABORT transação{%s} concluida", transaction.getTid()));
+            // SE TIVE DE FAZER UM ABORT POR CONTA DE UMA ESPERA,
             if(accountWaiting == true){
                 // Adiciona na lista de historico como falha
                 transaction.setTransactionStatus(TransactionStatus.WAITING_COMMIT);
@@ -175,7 +173,7 @@ public class TwoPhaseCommitCoordinator {
         else{
             try{
                 logger.info(String.format("2PC PREPARE - Encaminhando operação{%s} para Banco{%s}", operation.getOid(), operation.getBankCode()));
-                uri = consortium.get(operation.getBankCode()).getBankUrl() + "bank/prepare"; // Pega o uri do banco
+                uri = consortium.get(operation.getBankCode()) + "bank/prepare"; // Pega o uri do banco
                 logger.info(String.format("2PC PREPARE - Realizando PREPARE externo para operação{%s} - uri{%s}", operation.getOid(), uri));
                 res =  this.httpService.post2PC( uri, PresenterOperation.modelToDto(operation));
                 logger.info(String.format("2PC PREPARE - Recebi para operação{%s} do Banco{%s} -> %s", operation.getOid(), operation.getBankCode(), res.responseNode.name()));
@@ -222,7 +220,7 @@ public class TwoPhaseCommitCoordinator {
         }
         // Se for em um banco externo
         else {
-            uri = consortium.get(operation.getBankCode()).getBankUrl() + "bank/commit"; // Pega o uri do banco
+            uri = consortium.get(operation.getBankCode()) + "bank/commit"; // Pega o uri do banco
             logger.info(String.format("2PC COMMIT - Realizando COMMIT externo para operação{%s} - uri{%s}", operation.getOid(), uri));
 
             // Bloco para enviar a requisição de commit
@@ -233,6 +231,7 @@ public class TwoPhaseCommitCoordinator {
                 Retries r = new Retries();
                 r.uri = uri;
                 r.operation = operation;
+                logger.info(String.format("2PC COMMIT - Não consegui entregar operação{%s} para uri{%s}. Adicionando em Retries", operation.getOid(), uri));
                 // Coloca na fila de retries
                 try {
                     this.blockingQueueRetries.put(r);
@@ -280,7 +279,7 @@ public class TwoPhaseCommitCoordinator {
         }
         // Se for em um banco externo
         else {
-            uri = consortium.get(operation.getBankCode()).getBankUrl() + "bank/abort"; // Pega o uri do banco
+            uri = consortium.get(operation.getBankCode()) + "bank/abort"; // Pega o uri do banco
             try{
                 _2PCResponse aux = this.httpService.post2PC( uri, PresenterOperation.modelToDto(operation));
                 logger.info(String.format("2PC ABORT - A trava da conta{%s} operação{%s} foi retirada", operation.getAccountCode(), operation.getOid()));
@@ -290,6 +289,7 @@ public class TwoPhaseCommitCoordinator {
                 r.uri = uri;
                 r.operation = operation;
                 // Coloca na fila de retries
+                logger.info(String.format("2PC ABORT - Não consegui entregar operação{%s} para uri{%s}. Adicionando em Retries", operation.getOid(), uri));
                 try {
                     this.blockingQueueRetries.put(r);
                 } catch (InterruptedException ex) {

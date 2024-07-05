@@ -91,7 +91,7 @@ public class UserController {
 
 
     /** Obtem determinada transação, localmente, com base no id especiificado.
-     * (UTILIZADO PARA FINS DE TESTE E DEBUG DA APLICAÇÃO APENAS)
+     *
      *
      * @param tid -> Id global da transação
      * @return
@@ -105,4 +105,3 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 }
-//openSubTransaction

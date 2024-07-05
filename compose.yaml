@@ -5,6 +5,7 @@ services:
     image: wolivej/back-banco-app
     environment:
       - BANK_CODE=${BANK_CODE}
+      - BANK_STRUCT=${BANK_STRUCT}
     ports:
       - "8080:8080"
     networks:
@@ -14,6 +15,7 @@ services:
     image: wolivej/front-banco-app
     environment:
       - BANK_CODE=${BANK_CODE}
+      - BANK_STRUCT=${BANK_STRUCT}
     ports:
       - "3000:80"
     depends_on:
