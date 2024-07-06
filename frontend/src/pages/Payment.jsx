@@ -119,14 +119,15 @@ export default function Payment() {
                     </Col>
                 </Row>
                 <Row style={{ padding: '1rem' }}>
-                    <h1 className="display-6" style={{ textAlign: 'center' }}> Transferência </h1>
+                    <h1 className="display-6" style={{ textAlign: 'center' }}> Pagamento </h1>
                     {error ? (
                         <Alert size="sm" variant="danger">{error}</Alert>
                     ) : null}
 
                     {message ? (
                         <Alert size="sm" variant="success"> 
-                            {message} - <Link to={`/transaction/${tid}`}>Click here to view transaction status</Link>
+                            {message} 
+                            {/* {message} - <Link to={`/transaction/${tid}`}>Click here to view transaction status</Link> */}
                         </Alert>
                     ) : null}
                 </Row>

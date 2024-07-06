@@ -41,7 +41,7 @@ Cada elemento da lista corresponde a informação de onde um nó vai estar local
 Conforme a explicação sobre os valores das variaveis, execute o código abaixo para iniciar o nó.
 ```
 export BANK_CODE={CODIGO_DO_BANCO}
-export BANK_STRUCT={ESTRUTURA_DO_BANCO}
+export BANK_STRUCT='{ESTRUTURA_DO_BANCO}'
 docker-compose up
 ```
 Repita o processo em cada computador diferente, se atentando aos que apresentam o ip especificado em ESTRUTURA_DO_BANCO.

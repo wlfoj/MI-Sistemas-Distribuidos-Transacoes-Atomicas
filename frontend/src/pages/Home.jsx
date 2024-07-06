@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import Api from '../utils/api';
 
 
 const container = {
@@ -23,6 +25,8 @@ const logout = {
 export default function Home() {
 
 	const history = useHistory();
+	const [cpf] = useState(localStorage.getItem('cpf'));
+	const [accounts, setAccounts] = useState([]);
 
 	const Logout = () => {
 		localStorage.clear(); // Limpa o localStorage
@@ -30,6 +34,19 @@ export default function Home() {
 		localStorage.setItem('bankCode', bankCode);
 		history.replace("/login"); //Redireciona para tela de Login
 	};
+
+
+	useEffect(() => { // Função para pegar a tela de transação
+
+        Api.get(`/user/accounts/${cpf}`)
+
+            .then((body) => {
+                console.log(body.data)
+                setAccounts(body.data.accountsToUse);
+            }).catch((err) => {
+                console.log("Erro: " + err);
+            });
+    }, [cpf])
 
 	return (
 		<>
@@ -39,6 +56,18 @@ export default function Home() {
 						<Button style={logout} onClick={Logout}> Logout </Button>
 					</Col>
 				</Row>
+				{/* AQUI EU TENHO UMA VISUALIZAÇÃO DAS CONTAS DO USUÁRIO */}
+                <Row>
+                    {accounts.map((account, index) => (
+						<div>
+							<div>Código do banco: {account.bankCode}</div>
+							<div>Número da conta: {account.accountCode}</div>
+							<div>Saldo: R$ {account.value}</div>
+							<hr />
+						</div>
+                    ))}
+                </Row>
+				{/*  */}
 				<Row className="justify-content-md-center" style={{ padding: '1rem', textAlign: 'center' }}>
 					<h1 className="display-6"> Serviços </h1>
 				</Row>
