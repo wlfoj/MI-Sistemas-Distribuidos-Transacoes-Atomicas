@@ -1,9 +1,21 @@
-// Mapeamento de códigos de banco para URLs
-const consortium = {
-    '1': 'http://127.0.0.1:8080',
-    '2': 'http://172.13.0.11:8080',
-    '3': 'http://172.13.0.12:8080',
-  };
-  
-  export default consortium;
-  
+function parseStringToObject(str) {
+  try {
+    // Analisa a string JSON para um array de objetos
+    const array = JSON.parse(str);
+    
+    // Inicializa um objeto vazio
+    const obj = {};
+
+    // Para cada objeto no array, adiciona ao objeto final usando bankCode como chave
+    array.forEach(item => {
+      obj[item.bankCode] = item.url;
+    });
+
+    return obj;
+  } catch (error) {
+    console.error('Erro ao analisar a string JSON:', error);
+    return null;
+  }
+}
+
+export default parseStringToObject;
