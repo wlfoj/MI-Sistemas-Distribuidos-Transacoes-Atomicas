@@ -46,7 +46,7 @@ public class AppConfig {
 
         // Se n tem nada na var de ambiente, seto as configurações de localhost
         if (aux.equals("0")){
-            aux = "[{\"bankCode\": \"1\", \"url\": \"http://127.0.0.1:8080/\"}, {\"bankCode\": \"9\", \"url\": \"http://127.0.0.1:8081/\"}, {\"bankCode\": \"8\", \"url\": \"http://127.0.0.1:8082/\"}]";
+            aux = "[{\"bankCode\": \"1\", \"url\": \"http://127.0.0.1:8080/\"}, {\"bankCode\": \"2\", \"url\": \"http://127.0.0.1:8081/\"}, {\"bankCode\": \"3\", \"url\": \"http://127.0.0.1:8082/\"}]";
         }
         System.out.println(String.format("Estou usando %s da para o consorcio", aux));
 
