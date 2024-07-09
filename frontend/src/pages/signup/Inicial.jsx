@@ -25,6 +25,13 @@ export default function Inicial() {
 		<>
 			<Container style={container}>
 				<Row className="justify-content-md-center" style={{ padding: '1rem' }}>
+					<Col md style={coluna}>
+						<Link to="/login">
+							<Button style={botao}> Login </Button>
+						</Link>
+					</Col>
+				</Row>
+				<Row className="justify-content-md-center" style={{ padding: '1rem' }}>
 					<h1 className="display-6"> Qual o tipo de conta você gostaria de cadastrar? </h1>
 				</Row>
 				<Row className="justify-content-md-center" style={{ paddingBottom: '1rem', paddingTop: '1rem' }}>

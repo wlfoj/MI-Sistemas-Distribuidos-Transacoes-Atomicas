@@ -33,7 +33,7 @@ wget -O compose.yaml https://raw.githubusercontent.com/wlfoj/MI-Sistemas-Distrib
 
 Como o banco é entendido pelo conjunto da API e da interface gráfica, será preciso instância os dois serviços em um mesmo container. BANK_STRUCT é a variável de ambiente que indica o endereço de cada banco. Sendo assim, atribua o valor da variavel conforme o exemplo abaixo.
 ```
-export BANK_STRUCT= '[{"bankCode": "8", "url": "http://172.16.103.8:8080/"}, {"bankCode": "9", "url": "http://172.16.103.9:8080/"}, {"bankCode": "11", "url": "http://172.16.103.11:8080/"}]'
+export BANK_STRUCT='[{"bankCode": "8", "url": "http://172.16.103.8:8080/"}, {"bankCode": "9", "url": "http://172.16.103.9:8080/"}, {"bankCode": "11", "url": "http://172.16.103.11:8080/"}]'
 ```
 
 Cada elemento da lista corresponde a informação de onde um nó vai estar localizado (deverá ter um computador em cada endereço). Todos os bancos devem ser iniciados com o mesmo valor para as variaveis de ambiente. CODIGO_DO_BANCO deverá ser o bankCode do computador que representa o nó que está sendo iniciado no momento.
@@ -61,10 +61,6 @@ O backend foi desenvolvido em Java17, Spring Boot, e o frontend em React 18. O r
 
 # 2. Visão geral
 Em backend há os arquivos referentes ao serviço da API do banco. Em frontend há os arquivos referentes ao serviço da interface gráfica de um banco em questão. Fez-se o emprego do Docker, tanto na etapa de desenvolvimento quanto de produção, para isolar o sistema de eventuais problemas que podem ocorrer ao utilizar uma máquina compartilhada. O código do produto está comentado, exceto em nomes da variaveis e métodos auto-explicativos.
-
-
-============================Breve explicação dos pacotes =========
-============================Breve explicação dos pacotes =========
 
 O sistema bancário desenvolido não utiliza a arquitetura peer-to-peer (2P2), onde um banco poderá ser tanto um cliente quanto um servidor em determinado momento. Por exemplo, quando um banco precisa perguntar aos demais se determinado cpf possui alguma conta registrada em cada um deles. Tal situação se repete quando um banco recebe uma requisição de transação e precisa comunicar os demais participantes.
 

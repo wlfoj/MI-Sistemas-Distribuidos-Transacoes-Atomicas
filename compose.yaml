@@ -11,7 +11,7 @@ services:
 
 
   front-app:
-    image: wolivej/front-banco-app
+    image: wolivej/front2-banco-app
     environment:
       - BANK_CODE=${BANK_CODE}
       - BANK_STRUCT=${BANK_STRUCT}

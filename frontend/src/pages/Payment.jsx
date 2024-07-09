@@ -126,8 +126,7 @@ export default function Payment() {
 
                     {message ? (
                         <Alert size="sm" variant="success"> 
-                            {message} 
-                            {/* {message} - <Link to={`/transaction/${tid}`}>Click here to view transaction status</Link> */}
+                           {message} - <Link to={`/transaction/${tid}`}>Clique aqui para ver o satus</Link>
                         </Alert>
                     ) : null}
                 </Row>
