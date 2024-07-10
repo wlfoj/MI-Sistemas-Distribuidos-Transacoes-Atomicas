@@ -133,6 +133,16 @@ O usuário poderá realizar deposito em qualquer conta do sistema (**figura 10**
 </p>
 <p align="center">Fonte: Autor</p>
 
+Uma tela para visualizar o status de transação também foi desenvolvida, mesmo não sendo necessário, pois o processamento de transações ocorre de forma assíncrona . Com isso, obteve-se uma forma de verificar o andamento de uma transação no frontend (para fins de debug). A tela pode ser verificada na **figura 42**.
+
+<p align="center"><b>Figura 42</b> - Tela de status de transação.</p>
+<p align="center">
+  <img src="img\status_transacao.png" width='400px'>
+</p>
+<p align="center">Fonte: Autor</p>
+
+
+
 Todas as chamadas a API de um banco ocorrem de forma síncrona, exceto a de transações. Quando uma solicitação de transação é recebida, o banco avalia a requisição, buscando incoerências, e caso esteja incorreta responderá uma mensagem de erro padrão (ver sessão de comunicação e protocolos). Caso a transação recebida seja aprovada, uma mensagem de aceitação é devolvida ao usuário, e a requisição é depositada em uma fila de transações cujo processamento se dará por uma outra thread. O processamento da transação em si, na thread, é feito de forma síncrona, ou seja, é feita uma requisição para cada participante e aguarda-se a resposta. 
 
 #### 3.1 Transação Atômica e 2PC
